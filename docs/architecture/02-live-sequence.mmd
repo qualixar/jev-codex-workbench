@@ -1,0 +1,21 @@
+sequenceDiagram
+  actor H as Human
+  participant C as Codex
+  participant M as Local MCP
+  participant B as Call grant
+  participant J as TypeSafe API
+  participant R as Receipt store
+  H->>B: Authorize finite attempts in private Terminal
+  C->>M: jev_evaluate(case_id, approved state)
+  M->>M: Validate and screen input
+  M->>B: Atomically reserve one HTTP attempt
+  alt Grant absent or expired
+    B-->>M: Deny
+    M-->>C: Safe error, no network request
+  else Grant available
+    M->>J: Fixed-origin HTTPS request
+    J-->>M: Typed answer and usage
+    M->>M: Validate answer and evaluate local policy
+    M->>R: Save source-bound receipt
+    M-->>C: Advisory result, no execution authorization
+  end

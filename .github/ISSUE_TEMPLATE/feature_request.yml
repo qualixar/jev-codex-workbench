@@ -1,0 +1,33 @@
+name: Feature request
+description: Propose a bounded, testable improvement.
+title: "[Feature]: "
+labels: [enhancement]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: What user decision or failure does this address?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposed behavior
+      description: Describe the smallest useful change and its trust boundary.
+    validations:
+      required: true
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Acceptance evidence
+      description: How should the result be tested without private data?
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundary
+    attributes:
+      label: Global-plugin boundary
+      options:
+        - label: This request does not add credentials, network calls, or live authority to the global plugin.
+          required: true

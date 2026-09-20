@@ -1,0 +1,3 @@
+# Optional capture only. Target verified in current upstream release notes on 2026-09-20.
+# Core runtime has no third-party dependencies. Re-run browser QA after installation.
+playwright==1.63.0

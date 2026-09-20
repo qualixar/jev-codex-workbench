@@ -1,0 +1,14 @@
+flowchart LR
+  T[Authorized text candidates] --> S[Best-effort data screening]
+  S --> J[Relevance + instruction risk + contradiction questions]
+  J --> P[Deterministic per-item policy]
+  P --> K[KEEP]
+  P --> C[KEEP_WITH_CONFLICT]
+  P --> R[REVIEW]
+  P --> Q[QUARANTINE]
+  P --> D[DROP_CANDIDATE]
+  K -. Optional inspected harness adapter .-> A[Agent context]
+  C -. Preserve conflict .-> A
+  R --> H[Review first]
+  Q --> H
+  D --> N[No files deleted]

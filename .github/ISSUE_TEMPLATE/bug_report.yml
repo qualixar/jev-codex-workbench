@@ -1,0 +1,48 @@
+name: Bug report
+description: Report a reproducible defect using synthetic data.
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, private code, customer data, or sensitive receipts.
+  - type: input
+    id: version
+    attributes:
+      label: Version
+      placeholder: v1.1.0
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Surface
+      options:
+        - Codex Desktop global offline plugin
+        - Codex CLI global offline plugin
+        - Project-live adapter
+        - Evidence viewer or capture tooling
+        - Documentation
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Synthetic reproduction
+      description: Give the smallest safe steps, expected result, and actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: checks
+    attributes:
+      label: Verification run
+      description: List the exact local checks you ran and their result.
+    validations:
+      required: true
+  - type: checkboxes
+    id: safety
+    attributes:
+      label: Safety confirmation
+      options:
+        - label: I removed secrets, private code, personal data, and sensitive receipts.
+          required: true

@@ -1,0 +1,7 @@
+flowchart TD
+  B[Existing bounded-loops scheduler] -. Future inspected adapter .-> J[Jev bounded judgment]
+  J -. Advisory classification .-> P[Existing harness policy]
+  P --> R[Retry, review, stop, or approved transition]
+  P -. Approved durable fact only .-> S[Existing SuperLocalMemory admission]
+  B -. Existing ephemeral coordination only .-> M[Existing Mesh]
+  N[Dashed integrations are proposed, not installed by this kit]

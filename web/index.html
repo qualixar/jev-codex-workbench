@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Jev + Codex | Evidence Workbench</title><link rel="stylesheet" href="/styles.css"><script defer src="/app.js"></script></head>
+<body>
+<header class="top"><div class="brand"><b>JEV <span>+ CODEX</span></b><small>DECISION WORKBENCH / 01</small></div><div class="local">LOCAL VIEWER · READ ONLY</div></header>
+<div id="provenance" class="provenance" role="status">NO RUN SELECTED · NO LIVE INFERENCE</div>
+<main>
+<section class="intro"><div><div class="eyebrow">AGENT ENGINEERING / EVIDENCE BEFORE CLAIMS</div><h1>Codex reasons. Jev judges.<br>Code stays in control.</h1><p>Inspect the input, the bounded judgment, and the policy outcome. Every result carries its origin.</p></div><div class="summary"><b id="case-count">20</b><span>executable case definitions</span><div><strong id="fixture-count">0</strong> fixture receipts <i>/</i> <strong id="live-count">0</strong> live receipts</div></div></section>
+<nav class="flow" aria-label="Architecture, schematic"><div><small>01 / PRIMARY AGENT</small><b>Codex</b><span>Your selected coding model</span></div><div><small>02 / LOCAL BOUNDARY</small><b>Jev control tool</b><span>Input contract + data screening</span></div><div><small>03 / JUDGMENT</small><b>Fixture or Jev API</b><span>Origins never mixed</span></div><div><small>04 / APPLICATION CODE</small><b>Policy + evidence</b><span>Advice is not authorization</span></div></nav>
+<section class="workspace"><aside><h2>Use-case library</h2><label for="case-search">Find a workflow</label><input id="case-search" placeholder="Search workflows" type="search"><div id="case-list"></div></aside>
+<article id="run-panel">
+<div class="toolbar"><div><label for="case-select">Workflow</label><select id="case-select"></select></div><div><label for="mode-select">Evidence origin</label><select id="mode-select"><option value="fixture">Offline fixture</option><option value="live">Recorded live Jev</option></select></div><div><label for="variant-select">Scenario</label><select id="variant-select"><option value="nominal">Nominal</option><option value="adversarial">Adversarial</option><option value="uncertain">Uncertain</option></select></div><button id="refresh">Refresh receipts</button></div>
+<div id="connection" role="status"></div>
+<div class="case-heading"><div><div id="case-category" class="eyebrow">WORKFLOW</div><h2 id="case-title">Select a workflow</h2></div><span id="policy-status" class="badge">NO EVIDENCE</span></div>
+<div id="empty" class="empty" hidden>No matching receipt yet. Run the case from the terminal or Codex MCP, then refresh. The browser does not make model calls.</div>
+<div id="evidence">
+<section class="decision"><small>DETERMINISTIC POLICY OUTCOME</small><h3 id="decision-title">—</h3><p id="decision-reason"></p><div id="decision-items"></div><p class="caveat">Demonstration thresholds. Human review remains required. This tool cannot authorize execution.</p></section>
+<div class="evidence-grid"><section><h3>01 / Supplied evidence</h3><pre id="input-state"></pre></section><section><h3>02 / Typed judgments</h3><div id="answer-list"></div></section></div>
+<details><summary>Inspect full recorded receipt</summary><pre id="raw-receipt"></pre></details>
+<footer class="receipt"><span id="run-id"></span><span id="model-id"></span><span id="run-time"></span></footer>
+</div>
+</article></section>
+<footer class="bottom">No automatic tool interception. No production writes. No custom-source evidence in this viewer. All content requires publication review.</footer>
+</main>
+</body></html>

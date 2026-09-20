@@ -1,0 +1,12 @@
+flowchart LR
+  F[Simulated fixture receipt] --> S[Synthetic-only screened store]
+  L[Actual Jev receipt on synthetic state] --> S
+  C[Custom-source receipt] --> X[Excluded from viewer and export]
+  S --> V[Read-only evidence viewer]
+  V --> P[Real PNG + WebM browser capture]
+  P --> M[Padded MP4 source clip]
+  S --> Z[Evidence bundle + hashes + claim ledger]
+  P --> Z
+  M --> Z
+  Z --> H[Human frame-by-frame and rights review]
+  H --> B[Later blog and reel production]

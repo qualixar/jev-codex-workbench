@@ -1,0 +1,13 @@
+.venv/
+.local/
+artifacts/
+.captures/
+__pycache__/
+.mypy_cache/
+.ruff_cache/
+*.py[cod]
+.env
+.env.*
+!.env.example
+.codex/config.toml
+.DS_Store

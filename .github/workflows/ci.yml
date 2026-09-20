@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        python-version: ["3.11", "3.13"]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Verify release manifest
+        run: python3 scripts/verify_package.py
+      - name: Package offline plugin runtime
+        run: python3 scripts/package_plugin_runtime.py
+      - name: Run tests
+        run: python3 -m unittest discover -s tests -v
+      - name: Run all fixture contracts
+        run: python3 jev.py suite

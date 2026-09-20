@@ -1,0 +1,10 @@
+flowchart TD
+  E[Requirement + source diff + test receipt] --> S[Screen and validate]
+  S --> J[Jev semantic judgments]
+  J --> D{Tests and syntax pass, tests ran, revision matches, receipt fresh?}
+  D -->|No| B[BLOCK regardless of favorable judgment]
+  D -->|Yes| Q{Semantic evidence meets configured thresholds?}
+  Q -->|Clear failure| B
+  Q -->|Uncertain| R[REVIEW: collect evidence or escalate]
+  Q -->|Yes| P[CHECKS_PASSED on supplied evidence]
+  P --> H[Ordinary approvals still required]

@@ -1,0 +1,20 @@
+{
+  "name": "qualixar-jev",
+  "interface": {
+    "displayName": "Qualixar Jev"
+  },
+  "plugins": [
+    {
+      "name": "qualixar-jev-control",
+      "source": {
+        "source": "local",
+        "path": "./plugins/qualixar-jev-control"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

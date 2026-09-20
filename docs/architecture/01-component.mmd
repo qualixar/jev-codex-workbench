@@ -1,0 +1,12 @@
+flowchart LR
+  C[Codex: existing selected model] -->|Explicit tool call| M[Local stdio MCP]
+  M --> V[Contract and data screening]
+  V --> F[Labeled fixture engine]
+  V --> G[Human-approved live grant]
+  G -->|HTTPS text state and questions| J[Hosted Jev API]
+  F --> P[Deterministic policy]
+  J --> A[Validate typed answers]
+  A --> P
+  P --> R[Private evidence receipts]
+  R --> W[Read-only synthetic evidence viewer]
+  P --> N[Advice only: execution_authorized false]

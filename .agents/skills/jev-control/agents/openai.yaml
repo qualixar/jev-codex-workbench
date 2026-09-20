@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jev Control Workbench"
+  short_description: "Run bounded Jev judgments and capture evidence"
+  default_prompt: "Use $jev-control to select the relevant workflow, verify its contract, and run the approved fixture or live judgment without exposing credentials."

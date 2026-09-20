@@ -1,0 +1,26 @@
+{
+  "name": "qualixar-jev-control",
+  "version": "1.1.0",
+  "description": "Global Jev workflows with OpenRouter or TypeSafe credentials and workspace-scoped live authority.",
+  "author": {
+    "name": "Varun Pratap Bhardwaj / Qualixar",
+    "email": "varun.pratap.bhardwaj@gmail.com"
+  },
+  "license": "MIT",
+  "keywords": ["qualixar", "jev", "typesafe", "mcp", "bounded-judgment"],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Qualixar Jev Control",
+    "shortDescription": "Jev decisions with explicit provider and workspace gates.",
+    "longDescription": "Adds 20 bounded Jev workflows to Codex. Users select OpenRouter or TypeSafe privately; live requests still require an expiring human-created grant for the exact workspace.",
+    "developerName": "Qualixar",
+    "category": "Productivity",
+    "capabilities": ["Interactive"],
+    "defaultPrompt": [
+      "Help me decide whether this task needs a bounded Jev judgment.",
+      "Classify the data before any Jev evaluation in this workspace.",
+      "Explain the provider and workspace-scoped Jev live-authority gates."
+    ]
+  },
+  "mcpServers": "./.mcp.json"
+}
