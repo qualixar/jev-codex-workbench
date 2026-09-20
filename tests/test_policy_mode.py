@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 import os
 import subprocess
 import tempfile
@@ -84,14 +85,18 @@ class PolicyModeTests(unittest.TestCase):
             self.assertNotIn(prompt, result.stdout)
 
     def test_enforce_hook_blocks_governed_tool_until_successful_jev_evaluation(self):
+        from jevkit.runtime import workspace_binding
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
+            binding = workspace_binding(ROOT)
+            request_id = "policy-" + hashlib.sha256(b"turn-enforce").hexdigest()[:24]
             submitted = run_hook(
                 {
                     "hook_event_name": "UserPromptSubmit",
                     "turn_id": "turn-enforce",
                     "prompt": "Rank the most relevant files before reading them all.",
-                    "cwd": "/synthetic/workspace",
+                    "cwd": str(ROOT),
                 },
                 mode="enforce",
                 data_root=root,
@@ -119,7 +124,13 @@ class PolicyModeTests(unittest.TestCase):
                     "hook_event_name": "PostToolUse",
                     "turn_id": "turn-enforce",
                     "tool_name": "mcp__qualixar_jev__jev_evaluate",
-                    "tool_input": {"case_id": "04-file-ranking"},
+                    "tool_input": {
+                        "case_id": "04-file-ranking",
+                        "workspace_path": binding["workspace_path"],
+                        "request_id": request_id,
+                        "data_classification": "internal-minimized",
+                        "state": {"requirement": "synthetic", "patch": "synthetic"},
+                    },
                     "tool_response": {
                         "isError": False,
                         "content": [
@@ -128,8 +139,14 @@ class PolicyModeTests(unittest.TestCase):
                                 "text": json.dumps(
                                     {
                                         "mode": "live",
+                                        "variant": "custom",
                                         "case_id": "04-file-ranking",
+                                        "data_classification": "internal-minimized",
+                                        "request_id": request_id,
+                                        "request_sha256": "b" * 64,
                                         "record_sha256": "a" * 64,
+                                        "workspace_id": binding["workspace_id"],
+                                        "revision": binding["revision"],
                                         "policy": {"execution_authorized": False},
                                     }
                                 ),
@@ -159,6 +176,7 @@ class PolicyModeTests(unittest.TestCase):
             self.assertEqual(len(ledgers), 1)
             ledger_text = ledgers[0].read_text()
             self.assertNotIn("Rank the most relevant", ledger_text)
+            self.assertNotIn("prompt_sha256", ledger_text)
             self.assertEqual(ledgers[0].stat().st_mode & 0o777, 0o600)
 
     def test_failed_jev_evaluation_does_not_satisfy_enforcement(self):
@@ -169,6 +187,7 @@ class PolicyModeTests(unittest.TestCase):
                     "hook_event_name": "UserPromptSubmit",
                     "turn_id": "turn-failed",
                     "prompt": "Select the right test set for this patch.",
+                    "cwd": str(ROOT),
                 },
                 mode="enforce",
                 data_root=root,
@@ -206,6 +225,7 @@ class PolicyModeTests(unittest.TestCase):
                     "hook_event_name": "UserPromptSubmit",
                     "turn_id": "turn-spoofed",
                     "prompt": "Rank these candidate files.",
+                    "cwd": str(ROOT),
                 },
                 mode="enforce",
                 data_root=root,
@@ -214,7 +234,7 @@ class PolicyModeTests(unittest.TestCase):
                 {
                     "hook_event_name": "PostToolUse",
                     "turn_id": "turn-spoofed",
-                    "tool_name": "mcp__untrusted__jev_evaluate",
+                    "tool_name": "mcp__untrusted_qualixar_fake__jev_evaluate",
                     "tool_input": {"case_id": "04-file-ranking"},
                     "tool_response": {"isError": False, "content": []},
                 },
@@ -230,6 +250,203 @@ class PolicyModeTests(unittest.TestCase):
                 },
                 mode="enforce",
                 data_root=root,
+            )
+            self.assertEqual(
+                json.loads(blocked.stdout)["hookSpecificOutput"]["permissionDecision"],
+                "deny",
+            )
+
+    def test_non_object_receipt_cannot_satisfy_enforcement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run_hook(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "turn_id": "turn-list-receipt",
+                    "prompt": "Rank these candidate files.",
+                    "cwd": str(ROOT),
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            evaluated = run_hook(
+                {
+                    "hook_event_name": "PostToolUse",
+                    "turn_id": "turn-list-receipt",
+                    "tool_name": "mcp__qualixar_jev__jev_evaluate",
+                    "tool_input": {"case_id": "04-file-ranking"},
+                    "tool_response": {
+                        "isError": False,
+                        "content": [{"type": "text", "text": "[]"}],
+                    },
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            self.assertEqual(evaluated.returncode, 0, evaluated.stderr)
+            blocked = run_hook(
+                {
+                    "hook_event_name": "PreToolUse",
+                    "turn_id": "turn-list-receipt",
+                    "tool_name": "Bash",
+                    "tool_input": {"command": "true"},
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            self.assertEqual(
+                json.loads(blocked.stdout)["hookSpecificOutput"]["permissionDecision"],
+                "deny",
+            )
+
+    def test_synthetic_live_receipt_cannot_satisfy_enforcement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run_hook(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "turn_id": "turn-synthetic",
+                    "prompt": "Rank these candidate files.",
+                    "cwd": str(ROOT),
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            receipt = {
+                "mode": "live",
+                "variant": "nominal",
+                "case_id": "04-file-ranking",
+                "data_classification": "synthetic",
+                "request_sha256": "b" * 64,
+                "record_sha256": "a" * 64,
+                "policy": {"execution_authorized": False},
+            }
+            run_hook(
+                {
+                    "hook_event_name": "PostToolUse",
+                    "turn_id": "turn-synthetic",
+                    "tool_name": "mcp__qualixar_jev__jev_evaluate",
+                    "tool_input": {"case_id": "04-file-ranking"},
+                    "tool_response": {
+                        "isError": False,
+                        "content": [{"type": "text", "text": json.dumps(receipt)}],
+                    },
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            blocked = run_hook(
+                {
+                    "hook_event_name": "PreToolUse",
+                    "turn_id": "turn-synthetic",
+                    "tool_name": "Bash",
+                    "tool_input": {"command": "true"},
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            self.assertEqual(
+                json.loads(blocked.stdout)["hookSpecificOutput"]["permissionDecision"],
+                "deny",
+            )
+
+    def test_enforce_blocks_oversized_prompt_and_private_ledger_failure(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            oversized = run_hook(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "turn_id": "turn-large",
+                    "prompt": "x" * 64_001,
+                    "cwd": str(ROOT),
+                },
+                mode="enforce",
+                data_root=root / "data",
+            )
+            self.assertEqual(json.loads(oversized.stdout)["decision"], "block")
+
+            target = root / "target"
+            target.mkdir()
+            linked = root / "linked"
+            linked.symlink_to(target, target_is_directory=True)
+            unsafe = run_hook(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "turn_id": "turn-unsafe-ledger",
+                    "prompt": "Rank these candidate files.",
+                    "cwd": str(ROOT),
+                },
+                mode="enforce",
+                data_root=linked,
+            )
+            self.assertEqual(json.loads(unsafe.stdout)["decision"], "block")
+
+    def test_receipt_from_another_workspace_cannot_satisfy_enforcement(self):
+        from jevkit.runtime import workspace_binding
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            other = root / "other"
+            other.mkdir()
+            subprocess.run(["git", "init", "-q", "-b", "main"], cwd=other, check=True)
+            subprocess.run(["git", "config", "user.email", "synthetic@example.invalid"], cwd=other, check=True)
+            subprocess.run(["git", "config", "user.name", "Synthetic Test"], cwd=other, check=True)
+            (other / "baseline.txt").write_text("baseline\n")
+            subprocess.run(["git", "add", "baseline.txt"], cwd=other, check=True)
+            subprocess.run(["git", "commit", "-q", "-m", "baseline"], cwd=other, check=True)
+            other_binding = workspace_binding(other)
+            turn_id = "turn-cross-workspace"
+            request_id = "policy-" + hashlib.sha256(turn_id.encode()).hexdigest()[:24]
+            run_hook(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "turn_id": turn_id,
+                    "prompt": "Rank these candidate files.",
+                    "cwd": str(ROOT),
+                },
+                mode="enforce",
+                data_root=root / "data",
+            )
+            receipt = {
+                "mode": "live",
+                "variant": "custom",
+                "case_id": "04-file-ranking",
+                "data_classification": "internal-minimized",
+                "request_id": request_id,
+                "request_sha256": "b" * 64,
+                "record_sha256": "a" * 64,
+                "workspace_id": other_binding["workspace_id"],
+                "revision": other_binding["revision"],
+                "policy": {"execution_authorized": False},
+            }
+            run_hook(
+                {
+                    "hook_event_name": "PostToolUse",
+                    "turn_id": turn_id,
+                    "tool_name": "mcp__qualixar_jev__jev_evaluate",
+                    "tool_input": {
+                        "case_id": "04-file-ranking",
+                        "workspace_path": other_binding["workspace_path"],
+                        "request_id": request_id,
+                        "data_classification": "internal-minimized",
+                    },
+                    "tool_response": {
+                        "isError": False,
+                        "content": [{"type": "text", "text": json.dumps(receipt)}],
+                    },
+                },
+                mode="enforce",
+                data_root=root / "data",
+            )
+            blocked = run_hook(
+                {
+                    "hook_event_name": "PreToolUse",
+                    "turn_id": turn_id,
+                    "tool_name": "Bash",
+                    "tool_input": {"command": "true"},
+                },
+                mode="enforce",
+                data_root=root / "data",
             )
             self.assertEqual(
                 json.loads(blocked.stdout)["hookSpecificOutput"]["permissionDecision"],

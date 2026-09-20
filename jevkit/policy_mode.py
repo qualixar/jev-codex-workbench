@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path
 from typing import Any
 
-from .security import private_dir, private_json, screen
+from .security import SafeError, private_dir, private_json, screen
 
 
 POLICY_MODES = ("off", "assist", "enforce")
@@ -150,7 +150,7 @@ def _read_ledger(path: Path) -> dict[str, Any] | None:
     return value if isinstance(value, dict) else None
 
 
-def _valid_live_response(response: Any, case_id: str) -> bool:
+def _valid_live_response(response: Any, ledger: dict[str, Any]) -> bool:
     if not isinstance(response, dict) or response.get("isError") is not False:
         return False
     content = response.get("content")
@@ -163,11 +163,23 @@ def _valid_live_response(response: Any, case_id: str) -> bool:
         receipt = json.loads(text)
     except (ValueError, RecursionError):
         return False
-    policy = receipt.get("policy") if isinstance(receipt, dict) else None
-    record_hash = receipt.get("record_sha256") if isinstance(receipt, dict) else None
+    if not isinstance(receipt, dict):
+        return False
+    policy = receipt.get("policy")
+    record_hash = receipt.get("record_sha256")
+    request_hash = receipt.get("request_sha256")
+    request_id = receipt.get("request_id")
     return bool(
         receipt.get("mode") == "live"
-        and receipt.get("case_id") == case_id
+        and receipt.get("variant") == "custom"
+        and receipt.get("case_id") == ledger.get("case_id")
+        and receipt.get("data_classification") in {"public", "internal-minimized"}
+        and isinstance(request_id, str)
+        and request_id == ledger.get("request_id")
+        and receipt.get("workspace_id") == ledger.get("workspace_id")
+        and receipt.get("revision") == ledger.get("revision")
+        and isinstance(request_hash, str)
+        and re.fullmatch(r"[0-9a-f]{64}", request_hash)
         and isinstance(policy, dict)
         and policy.get("execution_authorized") is False
         and isinstance(record_hash, str)
@@ -176,12 +188,14 @@ def _valid_live_response(response: Any, case_id: str) -> bool:
 
 
 def _is_qualixar_jev_evaluate(tool_name: str) -> bool:
-    lowered = tool_name.lower()
-    return (
-        lowered.startswith("mcp__")
-        and "qualixar" in lowered
-        and lowered.endswith("jev_evaluate")
-    )
+    return tool_name.lower() in {
+        "mcp__qualixar_jev__jev_evaluate",
+        "mcp__qualixar-jev__jev_evaluate",
+    }
+
+
+def _prompt_block(reason: str) -> dict[str, str]:
+    return {"decision": "block", "reason": reason}
 
 
 def handle_hook_event(event: dict[str, Any], *, data_root: Path, mode: str | None = None) -> dict[str, Any] | None:
@@ -197,7 +211,11 @@ def handle_hook_event(event: dict[str, Any], *, data_root: Path, mode: str | Non
     if event_name == "UserPromptSubmit":
         prompt = event.get("prompt")
         if not isinstance(prompt, str) or len(prompt.encode("utf-8")) > 64_000:
-            return None
+            return (
+                _prompt_block("Jev Policy Mode could not safely classify this prompt.")
+                if selected_mode == "enforce"
+                else None
+            )
         decision = classify_intent(prompt, mode=selected_mode)
         status = decision["status"]
         if status == "SKIP":
@@ -215,16 +233,31 @@ def handle_hook_event(event: dict[str, Any], *, data_root: Path, mode: str | Non
                 "never authorizes execution."
             )
         if status == "REQUIRE":
+            try:
+                from .runtime import workspace_binding
+
+                binding = workspace_binding(Path(str(event.get("cwd", ""))))
+            except (SafeError, OSError, ValueError):
+                return _prompt_block(
+                    "Jev Policy Mode enforce requires a valid Git workspace and revision."
+                )
+            request_id = "policy-" + hashlib.sha256(turn_id.encode()).hexdigest()[:24]
+            context += f" Use request_id={request_id} for the request-bound custom evaluation."
             ledger = {
                 "schema_version": 1,
                 "turn_sha256": hashlib.sha256(turn_id.encode()).hexdigest(),
-                "prompt_sha256": hashlib.sha256(prompt.encode()).hexdigest(),
-                "workspace_sha256": hashlib.sha256(str(event.get("cwd", "")).encode()).hexdigest(),
+                **binding,
                 "case_id": decision["case_id"],
+                "request_id": request_id,
                 "status": "pending",
                 "reason_code": decision["reason_code"],
             }
-            private_json(ledger_path, ledger)
+            try:
+                private_json(ledger_path, ledger)
+            except (SafeError, OSError, ValueError):
+                return _prompt_block(
+                    "Jev Policy Mode could not create its private turn ledger."
+                )
         return {
             "hookSpecificOutput": {
                 "hookEventName": "UserPromptSubmit",
@@ -240,10 +273,21 @@ def handle_hook_event(event: dict[str, Any], *, data_root: Path, mode: str | Non
         return None
 
     if event_name == "PostToolUse" and _is_qualixar_jev_evaluate(tool_name):
-        supplied_case = (event.get("tool_input") or {}).get("case_id") if isinstance(event.get("tool_input"), dict) else None
-        if supplied_case == ledger.get("case_id") and _valid_live_response(
-            event.get("tool_response"), ledger.get("case_id")
-        ):
+        tool_input = event.get("tool_input")
+        if not isinstance(tool_input, dict):
+            return None
+        supplied_path = tool_input.get("workspace_path")
+        try:
+            supplied_path = str(Path(supplied_path).expanduser().resolve()) if isinstance(supplied_path, str) else None
+        except OSError:
+            supplied_path = None
+        matches = (
+            tool_input.get("case_id") == ledger.get("case_id")
+            and tool_input.get("request_id") == ledger.get("request_id")
+            and tool_input.get("data_classification") in {"public", "internal-minimized"}
+            and supplied_path == ledger.get("workspace_path")
+        )
+        if matches and _valid_live_response(event.get("tool_response"), ledger):
             ledger["status"] = "satisfied"
             private_json(ledger_path, ledger)
         return None

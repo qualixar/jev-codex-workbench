@@ -49,9 +49,10 @@ Local classifier -- sensitive material --> BLOCK external evaluation
                 governed Codex tool may proceed
 ```
 
-The per-turn ledger contains hashes, the matched case identifier, a reason code, and the
-gate state. It does not contain the prompt, tool command, credential, or Jev request body.
-Files are stored under Codex's private plugin data directory with owner-only permissions.
+The per-turn ledger contains the matched case, a generated request ID, the canonical Git
+workspace identity and revision, a reason code, and the gate state. It does not contain
+the prompt, a prompt fingerprint, tool command, credential, or Jev request body. Files are
+stored under Codex's private plugin data directory with owner-only permissions.
 
 ## Trust and failure behavior
 
@@ -60,7 +61,9 @@ Codex skips them. Use `/hooks` after installation or upgrade and inspect the exa
 hook definitions before approving them.
 
 Assist mode never blocks work. Enforce mode blocks only the declared governed tools for
-a matched turn. A failed or mismatched Jev evaluation does not satisfy the gate. Switch to
+a matched turn. A failed, synthetic, or mismatched Jev evaluation does not satisfy the gate;
+enforcement requires a request-bound custom evaluation classified as `public` or
+`internal-minimized`. Switch to
 `assist` or `off` from a private terminal if the provider or grant is unavailable; Policy
 Mode never creates or expands a live grant itself.
 

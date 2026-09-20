@@ -76,6 +76,39 @@ def _revision_fingerprint(workspace_root: Path, workspace_id: str) -> str:
     return hashlib.sha256(b"\0".join(material)).hexdigest()
 
 
+def workspace_binding(workspace: Path) -> dict[str, str]:
+    """Resolve a directory to its canonical Git root and immutable review binding."""
+    supplied = Path(workspace).expanduser()
+    if supplied.is_symlink():
+        raise SafeError("WORKSPACE_DIRECTORY_REQUIRED")
+    supplied = supplied.resolve()
+    if not supplied.is_dir():
+        raise SafeError("WORKSPACE_DIRECTORY_REQUIRED")
+    try:
+        result = subprocess.run(
+            ["git", "-C", str(supplied), "rev-parse", "--show-toplevel"],
+            capture_output=True,
+            timeout=5,
+            check=False,
+        )
+    except (OSError, subprocess.SubprocessError):
+        raise SafeError("WORKSPACE_REVISION_REQUIRED") from None
+    if result.returncode != 0:
+        raise SafeError("WORKSPACE_REVISION_REQUIRED")
+    try:
+        root = Path(result.stdout.decode("utf-8").strip()).resolve()
+    except (UnicodeError, OSError):
+        raise SafeError("WORKSPACE_REVISION_REQUIRED") from None
+    if not root.is_dir() or not _inside(supplied, root):
+        raise SafeError("WORKSPACE_DIRECTORY_REQUIRED")
+    workspace_id = _workspace_id(root)
+    return {
+        "workspace_path": str(root),
+        "workspace_id": workspace_id,
+        "revision": _revision_fingerprint(root, workspace_id),
+    }
+
+
 @dataclass(frozen=True)
 class RuntimeContext:
     """Globally discoverable offline tools plus explicitly bound live tools."""
@@ -115,14 +148,10 @@ class RuntimeContext:
             supplied_workspace_root = self.workspace_root
             if supplied_workspace_root is None:
                 raise SafeError("WORKSPACE_ID_REQUIRED")
-            supplied_workspace = Path(supplied_workspace_root).expanduser()
-            if supplied_workspace.is_symlink():
-                raise SafeError("WORKSPACE_DIRECTORY_REQUIRED")
-            workspace_root = supplied_workspace.resolve()
-            if not workspace_root.is_dir():
-                raise SafeError("WORKSPACE_DIRECTORY_REQUIRED")
-            workspace_id = _workspace_id(workspace_root)
-            revision = _revision_fingerprint(workspace_root, workspace_id)
+            binding = workspace_binding(Path(supplied_workspace_root))
+            workspace_root = Path(binding["workspace_path"])
+            workspace_id = binding["workspace_id"]
+            revision = binding["revision"]
             state_root = state_root / "workspaces" / workspace_id
 
         private_dir(state_root)

@@ -14,7 +14,7 @@ def main() -> int:
     if not runtime.is_dir():
         return 0
     sys.path.insert(0, str(runtime))
-    from jevkit.policy_mode import handle_hook_event
+    from jevkit.policy_mode import handle_hook_event, policy_mode
 
     try:
         raw = sys.stdin.buffer.read(128_001)
@@ -24,7 +24,17 @@ def main() -> int:
     except (ValueError, UnicodeError, RecursionError):
         return 0
     data_root = Path(os.environ.get("PLUGIN_DATA", Path.home() / ".local" / "state" / "jev-control"))
-    result = handle_hook_event(event, data_root=data_root)
+    try:
+        result = handle_hook_event(event, data_root=data_root)
+    except Exception:
+        result = (
+            {
+                "decision": "block",
+                "reason": "Jev Policy Mode enforce failed safely; inspect the hook configuration.",
+            }
+            if policy_mode() == "enforce" and event.get("hook_event_name") == "UserPromptSubmit"
+            else None
+        )
     if result is not None:
         print(json.dumps(result, ensure_ascii=True, allow_nan=False, separators=(",", ":")))
     return 0
