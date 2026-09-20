@@ -56,6 +56,18 @@ class ProviderSetupTests(unittest.TestCase):
 
 
 class InstallerTests(unittest.TestCase):
+    def test_policy_mode_defaults_to_assist_without_overwriting_user_choice(self):
+        from jevkit.policy_mode import policy_mode, write_policy_mode
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp) / "config"
+            installer = load_script("install.py")
+            installer.ensure_default_policy(root)
+            self.assertEqual(policy_mode(root), "assist")
+            write_policy_mode("enforce", root)
+            installer.ensure_default_policy(root)
+            self.assertEqual(policy_mode(root), "enforce")
+
     def test_installer_uses_native_codex_marketplace_and_plugin_commands(self):
         installer = load_script("install.py")
         commands = []
