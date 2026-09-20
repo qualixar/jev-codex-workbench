@@ -16,6 +16,12 @@ PLUGIN = ROOT / "plugins" / "qualixar-jev-control"
 
 
 class PluginRuntimeTests(unittest.TestCase):
+    def test_release_is_policy_mode_patch_version(self):
+        manifest = json.loads((PLUGIN / ".codex-plugin" / "plugin.json").read_text())
+        self.assertEqual(manifest["version"], "1.1.1")
+        self.assertTrue((PLUGIN / "hooks" / "hooks.json").is_file())
+        self.assertTrue((PLUGIN / "hooks" / "jev_policy_hook.py").is_file())
+
     def test_release_manifest_contains_only_clean_checkout_files(self):
         manifest = json.loads((ROOT / "MANIFEST.json").read_text())
         tracked = set(
@@ -146,7 +152,15 @@ class PluginRuntimeTests(unittest.TestCase):
                 names = {tool["name"] for tool in rows[1]["result"]["tools"]}
                 self.assertEqual(
                     names,
-                    {"jev_health", "jev_catalog", "jev_describe", "jev_run_fixture", "jev_evaluate"},
+                    {
+                        "jev_health",
+                        "jev_catalog",
+                        "jev_describe",
+                        "jev_run_fixture",
+                        "jev_evaluate",
+                        "jev_policy_status",
+                        "jev_policy_check",
+                    },
                 )
                 health = json.loads(rows[2]["result"]["content"][0]["text"])
                 self.assertEqual(health["scope"], "global-hybrid")
