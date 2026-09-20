@@ -1,8 +1,13 @@
 # Start with Qualixar Jev Control
 
-Qualixar Jev Control adds 20 bounded Jev workflows to Codex Desktop and Codex CLI.
+Qualixar Jev Control adds a local selective Policy Mode and 20 bounded Jev workflows
+to Codex Desktop and Codex CLI.
 It supports OpenRouter Decisions and TypeSafe direct. This is an independent Qualixar
 integration, not an official TypeSafe or OpenAI product.
+
+Policy Mode is built to save Codex tokens by resolving narrow routing, ranking, triage,
+and evidence decisions before Codex loads more context or explores additional tools. Savings
+vary by task; verify them with an on/off benchmark before publishing a percentage.
 
 ## Install
 
@@ -19,7 +24,9 @@ local files. The key is not printed or passed through Codex chat.
 
 After installation, fully quit and reopen Codex Desktop and start a new task. That
 fresh-Desktop tool call is the final host verification step; an existing task does not
-prove that the newly installed plugin was loaded.
+prove that the newly installed plugin was loaded. Open `/hooks`, review the Qualixar Jev
+hook definitions, and mark them trusted. New or changed plugin hooks are skipped until
+that review is complete.
 
 ## Verify offline first
 
@@ -30,8 +37,19 @@ Use Qualixar Jev Control to check health, list the available workflows,
 describe case 08, and run its adversarial fixture. Do not use live Jev.
 ```
 
-The response should show `global-hybrid`, simulated fixture provenance, and
-`execution_authorized=false`.
+The response should show `global-hybrid`, `policy_mode.mode=assist`, simulated fixture
+provenance, and `execution_authorized=false`.
+
+Policy Mode is ON by default in `assist`. It classifies likely bounded decisions locally and
+adds a compact instruction without persisting the prompt. To make a matching Jev result
+mandatory before Bash or file-edit tools, opt into `enforce`:
+
+```bash
+python3 /path/to/jev-codex-workbench/scripts/set_policy_mode.py enforce
+```
+
+Restart Codex Desktop after changing modes. Use `off` to disable routing or `assist` to
+return to the default.
 
 ## Authorize live calls for one workspace
 
@@ -55,7 +73,8 @@ If you cannot use the hidden installer, copy `.env.example` to
 
 ## What is implemented
 
-- Five MCP tools: health, catalog, description, fixture execution, and gated live evaluation.
+- Seven MCP tools: health, policy status, local policy check, catalog, description,
+  fixture execution, and gated live evaluation.
 - Twenty decision workflows and 60 nominal, uncertain, and adversarial fixtures.
 - Fixed provider endpoints and model pins; no automatic provider fallback.
 - Workspace-, revision-, provider-, expiry-, and call-budget-bound live grants.

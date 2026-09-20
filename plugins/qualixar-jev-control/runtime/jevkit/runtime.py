@@ -17,7 +17,7 @@ from .security import SafeError, canonical, private_dir, validate_private_path
 GLOBAL_OFFLINE = "global-offline"
 GLOBAL_HYBRID = "global-hybrid"
 PROJECT_LIVE = "project-live"
-OFFLINE_TOOLS = ("jev_health", "jev_catalog", "jev_describe", "jev_run_fixture")
+OFFLINE_TOOLS = ("jev_health", "jev_policy_status", "jev_policy_check", "jev_catalog", "jev_describe", "jev_run_fixture")
 LIVE_TOOLS = OFFLINE_TOOLS + ("jev_evaluate",)
 ALLOWED_CLASSIFICATIONS = frozenset({"public", "internal-minimized"})
 BLOCKED_CLASSIFICATIONS = frozenset({"restricted", "prohibited"})

@@ -50,7 +50,14 @@ class GlobalHybridRuntimeTests(unittest.TestCase):
             ctx = self.make_context(Path(tmp), "global-offline")
             self.assertEqual(
                 set(ctx.tool_names()),
-                {"jev_health", "jev_catalog", "jev_describe", "jev_run_fixture"},
+                {
+                    "jev_health",
+                    "jev_policy_status",
+                    "jev_policy_check",
+                    "jev_catalog",
+                    "jev_describe",
+                    "jev_run_fixture",
+                },
             )
             self.assertNotIn("jev_evaluate", ctx.tool_names())
             self.assertNotIn("jev_grant", ctx.tool_names())

@@ -1,7 +1,7 @@
 {
   "name": "qualixar-jev-control",
-  "version": "1.1.0",
-  "description": "Global Jev workflows with OpenRouter or TypeSafe credentials and workspace-scoped live authority.",
+  "version": "1.1.1",
+  "description": "Selective Jev Policy Mode with local routing and workspace-scoped live authority.",
   "author": {
     "name": "Varun Pratap Bhardwaj / Qualixar",
     "email": "varun.pratap.bhardwaj@gmail.com"
@@ -11,8 +11,8 @@
   "skills": "./skills/",
   "interface": {
     "displayName": "Qualixar Jev Control",
-    "shortDescription": "Jev decisions with explicit provider and workspace gates.",
-    "longDescription": "Adds 20 bounded Jev workflows to Codex. Users select OpenRouter or TypeSafe privately; live requests still require an expiring human-created grant for the exact workspace.",
+    "shortDescription": "Selective Jev decisions with local Codex policy hooks.",
+    "longDescription": "Adds a local Policy Mode plus 20 bounded Jev workflows to Codex. Assist mode suggests relevant Jev judgments; opt-in enforce mode gates governed tools until a matching evaluation succeeds. Live requests still require an expiring human-created grant for the exact workspace.",
     "developerName": "Qualixar",
     "category": "Productivity",
     "capabilities": ["Interactive"],

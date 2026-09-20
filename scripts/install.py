@@ -11,7 +11,13 @@ from typing import Callable
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from scripts.configure_provider import configure  # noqa: E402
+from jevkit.policy_mode import write_policy_mode  # noqa: E402
 from jevkit.security import SafeError  # noqa: E402
+
+
+def ensure_default_policy(config_root: Path | None = None) -> Path:
+    """Enable low-friction local routing without replacing an explicit user choice."""
+    return write_policy_mode("assist", config_root, overwrite=False)
 
 
 def install_plugin(
@@ -51,8 +57,10 @@ def main() -> int:
     print("Qualixar Jev Control installer")
     print("Your key is entered through a hidden prompt and is never passed to Codex chat.")
     configure()
+    ensure_default_policy()
     install_plugin(ROOT)
     print("Installation complete. Fully quit and reopen Codex Desktop, then start a new task.")
+    print("Jev Policy Mode is set to assist. Review hooks with /hooks after restart.")
     print("Live calls still require a separate workspace-bound human grant.")
     return 0
 

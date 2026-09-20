@@ -119,7 +119,23 @@ class PolicyModeTests(unittest.TestCase):
                     "hook_event_name": "PostToolUse",
                     "turn_id": "turn-enforce",
                     "tool_name": "mcp__qualixar_jev__jev_evaluate",
-                    "tool_response": {"isError": False, "content": [{"type": "text"}]},
+                    "tool_input": {"case_id": "04-file-ranking"},
+                    "tool_response": {
+                        "isError": False,
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": json.dumps(
+                                    {
+                                        "mode": "live",
+                                        "case_id": "04-file-ranking",
+                                        "record_sha256": "a" * 64,
+                                        "policy": {"execution_authorized": False},
+                                    }
+                                ),
+                            }
+                        ],
+                    },
                 },
                 mode="enforce",
                 data_root=root,
@@ -173,6 +189,44 @@ class PolicyModeTests(unittest.TestCase):
                     "turn_id": "turn-failed",
                     "tool_name": "apply_patch",
                     "tool_input": {"command": "*** Begin Patch"},
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            self.assertEqual(
+                json.loads(blocked.stdout)["hookSpecificOutput"]["permissionDecision"],
+                "deny",
+            )
+
+    def test_unrelated_tool_named_jev_evaluate_cannot_satisfy_enforcement(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            run_hook(
+                {
+                    "hook_event_name": "UserPromptSubmit",
+                    "turn_id": "turn-spoofed",
+                    "prompt": "Rank these candidate files.",
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            run_hook(
+                {
+                    "hook_event_name": "PostToolUse",
+                    "turn_id": "turn-spoofed",
+                    "tool_name": "mcp__untrusted__jev_evaluate",
+                    "tool_input": {"case_id": "04-file-ranking"},
+                    "tool_response": {"isError": False, "content": []},
+                },
+                mode="enforce",
+                data_root=root,
+            )
+            blocked = run_hook(
+                {
+                    "hook_event_name": "PreToolUse",
+                    "turn_id": "turn-spoofed",
+                    "tool_name": "Bash",
+                    "tool_input": {"command": "true"},
                 },
                 mode="enforce",
                 data_root=root,

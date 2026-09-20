@@ -15,6 +15,11 @@ request/rubric/policy hashes, sample selection, errors and the test protocol. Do
 claim compliance certification, absence of vulnerabilities, complete injection defense,
 end-to-end local inference, or proven customer outcomes.
 
+Do not claim that Policy Mode saves a percentage of Codex tokens or cost from its
+architecture alone. TypeSafe request usage is not Codex usage. A savings claim requires a
+controlled Policy Mode off/on benchmark with the same tasks, Codex model, acceptance
+criteria, and Codex-side usage measurement.
+
 ## Early-access terms
 
 Review the terms attached to your actual early-access account and any separate NDA

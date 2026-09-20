@@ -1,0 +1,44 @@
+{
+  "description": "Local selective Jev policy routing for Codex. No prompt is sent externally by these hooks.",
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Checking local Jev policy",
+            "additionalContextLimit": 300
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^(Bash|apply_patch|Edit|Write)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Applying Jev policy gate"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": ".*jev_evaluate$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
+            "timeout": 5,
+            "statusMessage": "Recording Jev policy result"
+          }
+        ]
+      }
+    ]
+  }
+}

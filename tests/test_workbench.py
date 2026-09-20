@@ -195,9 +195,9 @@ class BudgetsAndHTTP(unittest.TestCase):
             self.assertEqual(n[0],1)
 
 class Interfaces(unittest.TestCase):
-    def test_mcp_defaults_to_four_offline_tools(self):
+    def test_mcp_defaults_to_six_offline_tools(self):
         with tempfile.TemporaryDirectory() as t:
-            self.assertEqual(len(tools(state_root=Path(t) / 'state')),4)
+            self.assertEqual(len(tools(state_root=Path(t) / 'state')),6)
     def test_tool_rejects_unknown_arguments(self):
         with tempfile.TemporaryDirectory() as t:
             with self.assertRaises(SafeError):call('jev_catalog',{'shell':'not-a-tool'},state_root=Path(t) / 'state')
@@ -209,7 +209,7 @@ class Interfaces(unittest.TestCase):
         with tempfile.TemporaryDirectory() as t:
             p=subprocess.run([sys.executable,str(ROOT/'jev.py'),'mcp','--state-root',str(Path(t) / 'state')],input='\n'.join(json.dumps(m) for m in messages)+'\n',text=True,capture_output=True,timeout=10)
         self.assertEqual(p.returncode,0);rows=[json.loads(x) for x in p.stdout.splitlines()];self.assertEqual(len(rows),3)
-        self.assertEqual(rows[0]['result']['protocolVersion'],'2025-11-25');self.assertEqual(len(rows[1]['result']['tools']),4)
+        self.assertEqual(rows[0]['result']['protocolVersion'],'2025-11-25');self.assertEqual(len(rows[1]['result']['tools']),6)
         self.assertEqual(len(json.loads(rows[2]['result']['content'][0]['text'])),20)
     def test_cli_catalog(self):
         with tempfile.TemporaryDirectory() as t:

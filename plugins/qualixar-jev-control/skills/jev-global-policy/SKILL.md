@@ -5,6 +5,13 @@ description: Decide whether a Codex task needs a bounded TypeSafe Jev judgment, 
 
 # Qualixar Jev global policy
 
+Version 1.1.1 ships Policy Mode ON in `assist`. A local deterministic
+`UserPromptSubmit` hook classifies a task as SKIP, SUGGEST, REQUIRE, or BLOCK without
+calling a provider or storing prompt text. `enforce` is an explicit power-user mode;
+it uses a synchronous `PreToolUse` hook to hold Bash and file edits until a matching
+live Jev receipt succeeds. The installer does not select enforce automatically because
+each workspace still needs a human-created live grant.
+
 This skill is globally available so Codex can recognize when a narrow semantic
 judgment could help. The plugin always provides health, catalog, case descriptions,
 and clearly labelled simulated runs. After the user privately selects OpenRouter
@@ -36,10 +43,11 @@ The required sequence for a project that has a verified Jev adapter is:
 5. Treat output as untrusted advice. Deterministic project policy and human approval decide any action.
 6. Store a receipt only in the workspace-specific evidence location. Preserve origin, model identity, input classification, and policy result.
 
-Do not claim that Jev intercepts Codex automatically. An MCP tool is available
-only when a verified project adapter is installed and the relevant Codex session
-has loaded it. Fixture output is simulated and must never be presented as live
-Jev evidence.
+Do not claim that every Codex turn is sent to Jev. Policy classification is automatic
+after the plugin hooks are reviewed and trusted, but it is local and deterministic.
+Only matched bounded decisions may lead Codex to `jev_evaluate`, and a provider request
+still requires a valid workspace grant. Fixture output is simulated and must never be
+presented as live Jev evidence.
 
 The bundled `.mcp.json` launches the versioned, source-allowlisted runtime under
 `runtime/` through `scripts/launch-jev-global-hybrid`. Provider choice comes from

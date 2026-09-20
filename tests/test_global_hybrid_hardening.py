@@ -60,7 +60,14 @@ class GlobalHybridHardeningTests(unittest.TestCase):
         names = {tool["name"] for tool in tools}
         self.assertEqual(
             names,
-            {"jev_health", "jev_catalog", "jev_describe", "jev_run_fixture"},
+            {
+                "jev_health",
+                "jev_policy_status",
+                "jev_policy_check",
+                "jev_catalog",
+                "jev_describe",
+                "jev_run_fixture",
+            },
         )
         self.assertNotIn("jev_evaluate", names)
 

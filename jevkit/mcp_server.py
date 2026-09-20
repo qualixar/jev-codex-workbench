@@ -3,6 +3,7 @@ from __future__ import annotations
 import json,sys
 from pathlib import Path
 from .engine import ROOT
+from .policy_mode import classify_intent,policy_status
 from .runtime import GLOBAL_HYBRID,GLOBAL_OFFLINE,PROJECT_LIVE,RuntimeContext
 from .security import SafeError,canonical
 VERSIONS=('2025-11-25','2025-06-18','2025-03-26','2024-11-05')
@@ -15,7 +16,7 @@ def context(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_r
 
 def health(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_root:Path|None=None,ctx=None):
     active=ctx or context(root,scope,state_root,workspace_root)
-    return {'version':'1.1.0',**active.health()}
+    return {'version':'1.1.1',**active.health(),'policy_mode':policy_status()}
 
 def tools(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_root:Path|None=None,ctx=None):
     active=ctx or context(root,scope,state_root,workspace_root)
@@ -30,6 +31,8 @@ def tools(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_roo
             'readOnlyHint':read,'destructiveHint':False,'idempotentHint':read,'openWorldHint':external}}
     offline=[
       tool('jev_health','Check local Jev readiness without revealing credentials. Does not call either provider.',obj({})),
+      tool('jev_policy_status','Report the local Codex Policy Mode without reading prompt text or calling a provider.',obj({})),
+      tool('jev_policy_check','Classify one task intent locally as SKIP, SUGGEST, REQUIRE, or BLOCK. Makes no provider call and persists no prompt text.',obj({'intent':{'type':'string','minLength':1,'maxLength':8000}},['intent'])),
       tool('jev_catalog','List the approved decision workflows; choose a case ID before judging.',obj({})),
       tool('jev_describe','Read required input fields, rubric and demonstration thresholds for one case.',obj({'case_id':case},['case_id'])),
       tool('jev_run_fixture','Run a clearly labeled OFFLINE synthetic fixture. No model inference; never use as proof of Jev accuracy.',obj({'case_id':case,'variant':variant},['case_id']),False)]
@@ -78,6 +81,8 @@ def call(name,args,root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,work
     schema=definitions[name]['inputSchema']
     _validate_arguments(schema,args)
     if name=='jev_health':return health(ctx=active)
+    if name=='jev_policy_status':return policy_status()
+    if name=='jev_policy_check':return classify_intent(args['intent'])
     if name=='jev_catalog':return active.catalog()
     if name=='jev_describe':return active.describe(args['case_id'])
     if name=='jev_run_fixture':return active.run_fixture(args['case_id'],args.get('variant','nominal'))
@@ -117,7 +122,7 @@ def serve(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_roo
                     'deployment, or access change.'
                 )
                 result={'protocolVersion':version if version in VERSIONS else VERSIONS[0],
-                    'serverInfo':{'name':'jev-control','version':'1.1.0'},'capabilities':{'tools':{'listChanged':False}},
+                    'serverInfo':{'name':'jev-control','version':'1.1.1'},'capabilities':{'tools':{'listChanged':False}},
                     'instructions':instructions}
                 initialized=True
             elif method=='ping':result={}

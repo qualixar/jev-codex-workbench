@@ -1,8 +1,17 @@
 # Qualixar Jev Control for Codex
 
-Give Codex a bounded Jev judgment layer for routing, ranking, triage, evidence checks,
-and completion review. Choose OpenRouter or TypeSafe once; every live call still needs
-an explicit, expiring grant for the exact workspace and repository revision.
+Give Codex a selective Jev judgment layer for routing, ranking, triage, evidence checks,
+and completion review. Version 1.1.1 adds Policy Mode: a local control plane that decides
+when a bounded Jev judgment could help before Codex expands context or uses governed tools.
+Choose OpenRouter or TypeSafe once; every live call still needs an explicit, expiring grant
+for the exact workspace and repository revision.
+
+**Jev Policy Mode is built to save Codex tokens.** It moves narrow semantic decisions—such
+as which files, tests, tools, skills, or sources deserve deeper attention—ahead of expensive
+context expansion and tool exploration. When that early decision removes unnecessary work,
+Codex uses less context and can spend its reasoning budget on the selected path. The amount
+saved depends on the task, so this release claims the mechanism and provides the controls;
+it does not invent a universal percentage.
 
 This is an independent open-source integration from **Qualixar**, created by
 **Varun Pratap Bhardwaj**. It works with TypeSafe's Jev service but is not an
@@ -22,11 +31,41 @@ OpenRouter or TypeSafe, and accepts the selected API key through a hidden termin
 prompt. It never prints the key or puts it in the repository. Then fully quit and
 reopen the Codex Desktop app and start a new task. OpenAI documents the same local
 plugin configuration for Codex Desktop and Codex CLI; native Desktop verification is
-the post-install step for this release.
+the post-install step for this release. Open `/hooks`, review the three Qualixar Jev
+hooks, and mark them trusted. Codex deliberately skips new or changed plugin hooks until
+the user reviews them.
 
-Four tools work without a key or live request:
+## Policy Mode
+
+Policy Mode runs a deterministic classifier locally on each submitted task. It makes no
+provider request and stores no prompt text. It returns one of four outcomes:
+
+| Outcome | Meaning |
+|---|---|
+| `SKIP` | Continue with Codex; no bounded Jev judgment was identified. |
+| `SUGGEST` | A supplied Jev workflow may reduce unnecessary exploration. |
+| `REQUIRE` | In opt-in enforce mode, governed write or shell tools wait for the matching Jev evaluation. |
+| `BLOCK` | Sensitive material was detected locally and must not be sent to Jev. |
+
+Policy Mode is **ON by default**. The installer selects `assist`, so every submitted task
+gets local policy classification without making every task a Jev API call. Change the mode
+from a private terminal:
+
+```bash
+python3 jev-codex-workbench/scripts/set_policy_mode.py off
+python3 jev-codex-workbench/scripts/set_policy_mode.py assist
+python3 jev-codex-workbench/scripts/set_policy_mode.py enforce
+```
+
+`enforce` governs Bash and file-edit calls only when a known bounded semantic decision is
+matched. It does not send every turn to Jev. A successful Jev response satisfies the turn
+gate, but the response still cannot authorize execution. See [Policy Mode](docs/POLICY_MODE.md).
+
+Six tools work without a key or live request:
 
 - `jev_health` reports the local runtime scope and safety state.
+- `jev_policy_status` reports the configured mode and control boundaries.
+- `jev_policy_check` runs the local no-network classifier on one task intent.
 - `jev_catalog` lists the 20 supplied decision workflows.
 - `jev_describe` explains one workflow's contract and limits.
 - `jev_run_fixture` runs a clearly labelled synthetic example.
@@ -155,6 +194,13 @@ Codex Desktop / CLI
 Jev output is untrusted advice. It cannot authorize shell commands, file writes,
 deployments, access decisions, or completion. Native Codex permissions and the
 operator's existing controls remain in force.
+
+Policy Mode can save Codex tokens when its bounded decision prevents unnecessary context
+expansion or tool exploration. It can also improve decision discipline by separating a
+narrow semantic judgment from Codex's broader reasoning and execution work. This repository
+does not claim a universal percentage or guaranteed quality gain. Those stronger claims
+require controlled on/off measurements using Codex-side usage and task acceptance results,
+not TypeSafe usage fields alone.
 
 ## Repository map
 
