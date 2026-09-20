@@ -60,7 +60,9 @@ def main() -> int:
     ensure_default_policy()
     install_plugin(ROOT)
     print("Installation complete. Fully quit and reopen Codex Desktop, then start a new task.")
-    print("Jev Policy Mode is set to assist. Review hooks with /hooks after restart.")
+    print("One-time setup: open a private terminal, run `codex`, then review and trust only")
+    print("the three Qualixar Jev hooks. `/hooks` is currently a Codex CLI command, not Desktop UI.")
+    print("After trust, quit the CLI and restart Codex Desktop. Policy Mode is then on in assist mode.")
     print("Live calls still require a separate workspace-bound human grant.")
     return 0
 

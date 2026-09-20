@@ -18,7 +18,7 @@ PLUGIN = ROOT / "plugins" / "qualixar-jev-control"
 class PluginRuntimeTests(unittest.TestCase):
     def test_release_is_policy_mode_patch_version(self):
         manifest = json.loads((PLUGIN / ".codex-plugin" / "plugin.json").read_text())
-        self.assertEqual(manifest["version"], "1.1.1")
+        self.assertEqual(manifest["version"], "1.1.2")
         self.assertTrue((PLUGIN / "hooks" / "hooks.json").is_file())
         self.assertTrue((PLUGIN / "hooks" / "jev_policy_hook.py").is_file())
 

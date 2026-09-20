@@ -24,9 +24,11 @@ local files. The key is not printed or passed through Codex chat.
 
 After installation, fully quit and reopen Codex Desktop and start a new task. That
 fresh-Desktop tool call is the final host verification step; an existing task does not
-prove that the newly installed plugin was loaded. Open `/hooks`, review the Qualixar Jev
-hook definitions, and mark them trusted. New or changed plugin hooks are skipped until
-that review is complete.
+prove that the newly installed plugin was loaded. Then open a private terminal and run
+`codex`. Codex Desktop does not currently expose `/hooks`; in the CLI, choose **Review
+hooks** and trust only the three `qualixar-jev-control@qualixar-jev` entries. Quit the CLI
+and restart Desktop once more. New or changed plugin hooks are skipped until that review is
+complete. See [Hook trust](docs/TRUSTING_HOOKS.md).
 
 ## Verify offline first
 

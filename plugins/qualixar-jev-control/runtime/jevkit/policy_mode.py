@@ -123,7 +123,7 @@ def classify_intent(intent: str, *, mode: str | None = None) -> dict[str, Any]:
 
 def policy_status(config_root: Path | None = None) -> dict[str, Any]:
     return {
-        "version": "1.1.1",
+        "version": "1.1.2",
         "mode": policy_mode(config_root),
         "default_mode": DEFAULT_POLICY_MODE,
         "modes": list(POLICY_MODES),

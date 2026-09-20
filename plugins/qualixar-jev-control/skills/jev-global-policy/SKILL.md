@@ -5,12 +5,14 @@ description: Decide whether a Codex task needs a bounded TypeSafe Jev judgment, 
 
 # Qualixar Jev global policy
 
-Version 1.1.1 ships Policy Mode ON in `assist`. A local deterministic
+Version 1.1.2 ships Policy Mode ON in `assist`. A local deterministic
 `UserPromptSubmit` hook classifies a task as SKIP, SUGGEST, REQUIRE, or BLOCK without
 calling a provider or storing prompt text. `enforce` is an explicit power-user mode;
 it uses a synchronous `PreToolUse` hook to hold Bash and file edits until a matching
 live Jev receipt succeeds. The installer does not select enforce automatically because
-each workspace still needs a human-created live grant.
+each workspace still needs a human-created live grant. New or changed plugin hooks need a
+one-time review in Codex CLI; Desktop shares the resulting trust state but currently has no
+`/hooks` command.
 
 This skill is globally available so Codex can recognize when a narrow semantic
 judgment could help. The plugin always provides health, catalog, case descriptions,

@@ -1,7 +1,7 @@
 # Qualixar Jev Control for Codex
 
 Give Codex a selective Jev judgment layer for routing, ranking, triage, evidence checks,
-and completion review. Version 1.1.1 adds Policy Mode: a local control plane that decides
+and completion review. Version 1.1.2 adds a clear hook-trust path for Policy Mode: a local control plane that decides
 when a bounded Jev judgment could help before Codex expands context or uses governed tools.
 Choose OpenRouter or TypeSafe once; every live call still needs an explicit, expiring grant
 for the exact workspace and repository revision.
@@ -31,9 +31,12 @@ OpenRouter or TypeSafe, and accepts the selected API key through a hidden termin
 prompt. It never prints the key or puts it in the repository. Then fully quit and
 reopen the Codex Desktop app and start a new task. OpenAI documents the same local
 plugin configuration for Codex Desktop and Codex CLI; native Desktop verification is
-the post-install step for this release. Open `/hooks`, review the three Qualixar Jev
-hooks, and mark them trusted. Codex deliberately skips new or changed plugin hooks until
-the user reviews them.
+the post-install step for this release. The hook review is a one-time CLI action because
+Codex Desktop currently does not expose `/hooks`. In a private terminal, run `codex`, choose
+**Review hooks**, and trust only the three `qualixar-jev-control@qualixar-jev` entries:
+`UserPromptSubmit`, `PreToolUse`, and `PostToolUse`. Quit the CLI, then restart Codex Desktop.
+Codex deliberately skips new or changed plugin hooks until that review is complete. See
+[Hook trust](docs/TRUSTING_HOOKS.md).
 
 ## Policy Mode
 
@@ -59,7 +62,8 @@ python3 jev-codex-workbench/scripts/set_policy_mode.py enforce
 
 `enforce` governs Bash and file-edit calls only when a known bounded semantic decision is
 matched. It does not send every turn to Jev. A successful Jev response satisfies the turn
-gate, but the response still cannot authorize execution. See [Policy Mode](docs/POLICY_MODE.md).
+gate, but the response still cannot authorize execution. See [Policy Mode](docs/POLICY_MODE.md)
+and [Hook trust](docs/TRUSTING_HOOKS.md).
 
 Six tools work without a key or live request:
 

@@ -18,7 +18,7 @@ def main() -> int:
     write_policy_mode(args.mode)
     status = policy_status()
     print(f"Jev Policy Mode: {status['mode']}")
-    print("Restart Codex Desktop and review the plugin hooks with /hooks.")
+    print("Restart Codex Desktop. For a new or changed plugin hook, review trust once in Codex CLI.")
     return 0
 
 

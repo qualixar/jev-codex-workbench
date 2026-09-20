@@ -16,7 +16,7 @@ def context(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_r
 
 def health(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_root:Path|None=None,ctx=None):
     active=ctx or context(root,scope,state_root,workspace_root)
-    return {'version':'1.1.1',**active.health(),'policy_mode':policy_status()}
+    return {'version':'1.1.2',**active.health(),'policy_mode':policy_status()}
 
 def tools(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_root:Path|None=None,ctx=None):
     active=ctx or context(root,scope,state_root,workspace_root)
@@ -122,7 +122,7 @@ def serve(root=ROOT,scope=GLOBAL_OFFLINE,state_root:Path|None=None,workspace_roo
                     'deployment, or access change.'
                 )
                 result={'protocolVersion':version if version in VERSIONS else VERSIONS[0],
-                    'serverInfo':{'name':'jev-control','version':'1.1.1'},'capabilities':{'tools':{'listChanged':False}},
+                    'serverInfo':{'name':'jev-control','version':'1.1.2'},'capabilities':{'tools':{'listChanged':False}},
                     'instructions':instructions}
                 initialized=True
             elif method=='ping':result={}

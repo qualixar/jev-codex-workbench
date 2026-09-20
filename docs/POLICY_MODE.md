@@ -57,8 +57,9 @@ stored under Codex's private plugin data directory with owner-only permissions.
 ## Trust and failure behavior
 
 Codex requires the user to review new or modified plugin hooks. Until they are trusted,
-Codex skips them. Use `/hooks` after installation or upgrade and inspect the exact three
-hook definitions before approving them.
+Codex skips them. The `/hooks` review browser is currently available in Codex CLI, not
+Desktop. Run `codex` in a private terminal, choose **Review hooks**, inspect the exact three
+Qualixar Jev entries, then quit and restart Desktop. See [Hook trust](TRUSTING_HOOKS.md).
 
 Assist mode never blocks work. Enforce mode blocks only the declared governed tools for
 a matched turn. A failed, synthetic, or mismatched Jev evaluation does not satisfy the gate;

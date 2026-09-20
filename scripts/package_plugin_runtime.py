@@ -51,7 +51,7 @@ def main() -> int:
         build_mode.read_bytes()
     ).hexdigest()
     manifest = {
-        "adapter_version": "1.1.1-policy-mode",
+        "adapter_version": "1.1.2-trust-ux",
         "mode": "global-hybrid",
         "live_evaluation_exposed": True,
         "credential_forwarding_configured": False,
