@@ -2,6 +2,8 @@
 
 **Bounded decisions and recoverable context for Codex.** The workbench adds a Qualixar plugin around the coding model you already use in Codex. Jev handles narrow semantic judgments; Codex remains responsible for code, tools, and execution. Version **1.1.3** adds standing workspace enrollment, compact receipts, extractive output reduction, shared budgets, and an optional local Laya-MLX route.
 
+The workbench targets two sources of wasted work: exploring too many candidate files or tools before a narrow decision, and carrying large successful tool outputs through Codex context when only a few source lines matter. It can reuse a decision for an identical request and retrieve omitted evidence exactly when needed. The mechanism is visible below; actual token and time savings still require matched accepted-task measurements.
+
 ![Qualixar Jev Codex Workbench architecture: Codex and its GPT coding model connect to the workbench plugin, which routes bounded decisions to TypeSafe Jev or optional Laya-MLX while SLM and the existing browser remain separate integrations.](docs/assets/qualixar-jev-codex-workbench-architecture.png)
 
 *Architecture overview. The provider branches are decision routes; neither provider receives execution authority. The browser path is included in 1.1.3 but still needs native host acceptance before broad use.*
@@ -111,6 +113,8 @@ python3 scripts/verify_package.py
 ```
 
 The manifest check reports differences if you have uncommitted source edits; run it against the exact release candidate. Before claiming savings, compare the same accepted task and coding model with and without the workbench. Include retries, elapsed time, host input/output tokens, Jev calls, and local compute separately. Cached host input is a subset of input, not extra usage. Unknown measurements remain unknown. The included measurement tools and acceptance protocol are documented in [the 1.1.3 implementation notes](docs/JEV_AUTO_1_1_3.md).
+
+See the [1.1.3 validation note](docs/RELEASE_VALIDATION_1_1_3.md) for the checks performed on the release candidate and the limits of the current measurements.
 
 ## Trust boundary and repository map
 
