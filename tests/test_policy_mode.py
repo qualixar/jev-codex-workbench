@@ -22,6 +22,7 @@ def run_hook(event: dict, *, mode: str = "assist", data_root: Path) -> subproces
         {
             "PLUGIN_ROOT": str(PLUGIN),
             "PLUGIN_DATA": str(data_root),
+            "XDG_STATE_HOME": str(data_root / "isolated-auto-state"),
             "QUALIXAR_JEV_POLICY_MODE": mode,
             "PYTHONDONTWRITEBYTECODE": "1",
         }

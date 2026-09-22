@@ -6,4 +6,4 @@ python3 -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 3
   printf '%s\n' 'PYTHON_3_11_REQUIRED' >&2
   exit 3
 }
-exec python3 "$PLUGIN_ROOT/runtime/jev.py" mcp --scope global-hybrid
+exec python3 "$PLUGIN_ROOT/runtime/auto_entry.py" mcp

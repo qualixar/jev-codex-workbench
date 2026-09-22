@@ -1,3 +1,13 @@
+# Qualixar Jev Auto 1.1.3
+
+Incremental upgrade: standing workspace enrollment, compact decisions, recoverable context filtering, existing-browser bursts, and optional Laya-MLX. See `docs/JEV_AUTO_1_1_3.md`. Existing SLM, native host permissions, selected coding model, and the twenty legacy workflows are preserved.
+
+Local tests do not establish token savings or native compatibility. Run the supplied acceptance protocol on the installed host.
+
+---
+
+## Legacy 1.1.2 operating reference (for unenrolled workspaces)
+
 # Qualixar Jev Control for Codex
 
 Give Codex a selective Jev judgment layer for routing, ranking, triage, evidence checks,

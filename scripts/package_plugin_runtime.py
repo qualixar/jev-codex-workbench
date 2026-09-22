@@ -13,13 +13,14 @@ TARGET = PLUGIN / "runtime"
 
 
 def sources() -> list[Path]:
-    files = [ROOT / "jev.py"]
+    files = [ROOT / "jev.py", ROOT / "auto_entry.py"]
     files.extend(
         source
         for source in sorted((ROOT / "jevkit").glob("*.py"))
     )
     files.extend(sorted((ROOT / "use_cases").glob("*.json")))
     files.extend(sorted((ROOT / "fixtures").glob("*/*.json")))
+    files.extend(sorted((ROOT / "jev_auto").rglob("*.py")))
     return files
 
 
@@ -51,7 +52,7 @@ def main() -> int:
         build_mode.read_bytes()
     ).hexdigest()
     manifest = {
-        "adapter_version": "1.1.2-trust-ux",
+        "adapter_version": "1.1.3-auto",
         "mode": "global-hybrid",
         "live_evaluation_exposed": True,
         "credential_forwarding_configured": False,

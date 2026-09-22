@@ -32,7 +32,7 @@ def main() -> int:
         if included(path)
     }
     manifest = {
-        "version": "1.1.2",
+        "version": "1.1.3",
         "hash_algorithm": "sha256",
         "note": (
             "Global-hybrid release manifest generated from the public source tree. "

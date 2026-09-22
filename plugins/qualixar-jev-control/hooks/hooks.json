@@ -1,43 +1,61 @@
 {
-  "description": "Local selective Jev policy routing for Codex. No prompt is sent externally by these hooks.",
+  "description": "Jev Auto 1.1.3: standing workspace operation; legacy mode outside enrollment.",
   "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
+            "timeout": 40
+          }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
           {
             "type": "command",
             "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
-            "timeout": 5,
-            "statusMessage": "Checking local Jev policy",
-            "additionalContextLimit": 300
+            "timeout": 40
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
+            "timeout": 40
           }
         ]
       }
     ],
     "PreToolUse": [
       {
-        "matcher": "^(Bash|apply_patch|Edit|Write)$",
         "hooks": [
           {
             "type": "command",
             "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
-            "timeout": 5,
-            "statusMessage": "Applying Jev policy gate"
+            "timeout": 40
           }
-        ]
+        ],
+        "matcher": "^(Bash|apply_patch|Edit|Write)$"
       }
     ],
     "PostToolUse": [
       {
-        "matcher": ".*jev_evaluate$",
         "hooks": [
           {
             "type": "command",
             "command": "python3 \"${PLUGIN_ROOT}/hooks/jev_policy_hook.py\"",
-            "timeout": 5,
-            "statusMessage": "Recording Jev policy result"
+            "timeout": 40
           }
-        ]
+        ],
+        "matcher": "^(Bash|Read|Grep|.*jev_evaluate)$"
       }
     ]
   }
