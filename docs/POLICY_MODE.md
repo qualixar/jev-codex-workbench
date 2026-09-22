@@ -1,5 +1,9 @@
 # Jev Policy Mode for Codex
 
+This page describes the original grant-based path for workspaces that have not been
+enrolled in Qualixar Jev Codex Workbench 1.1.3. For standing enrollment and local
+output reduction, start with the [README](../README.md).
+
 Policy Mode separates two jobs that should not be confused. A local deterministic
 control plane decides whether a task resembles one of the 20 supplied bounded judgment
 workflows. Jev is the optional decision plane for the matched semantic question. The

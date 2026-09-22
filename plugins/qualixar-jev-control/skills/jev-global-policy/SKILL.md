@@ -1,8 +1,8 @@
 ---
 name: jev-global-policy
-description: Use Qualixar Jev Auto for compact typed decisions, context reduction, browser bursts and workspace-shared budgets. Preserve existing SLM and Computer Use integrations.
+description: Use Qualixar Jev Codex Workbench for compact typed decisions, context reduction, browser bursts and workspace-shared budgets. Preserve existing SLM and Computer Use integrations.
 ---
-# Qualixar Jev Auto 1.1.3
+# Qualixar Jev Codex Workbench 1.1.3
 
 Readiness: jev_auto_status for the current workspace. When enrolled, do NOT ask for a
 new terminal grant per task or after a code edit. The standing policy already authorizes

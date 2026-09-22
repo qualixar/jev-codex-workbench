@@ -16,7 +16,7 @@ def bridge_record(path,p):
     write_private(f,data)
 
 def main(argv=None):
-    parser=argparse.ArgumentParser(description='Qualixar Jev Auto 1.1.3')
+    parser=argparse.ArgumentParser(description='Qualixar Jev Codex Workbench 1.1.3')
     sub=parser.add_subparsers(dest='command',required=True)
     sub.add_parser('mcp')
     en=sub.add_parser('enroll');en.add_argument('--workspace',required=True);en.add_argument('--provider',choices=['existing','typesafe','openrouter','laya-mlx'],default='existing')
@@ -50,7 +50,7 @@ def main(argv=None):
             print('No per-turn grants. Native Codex/browser permissions stay unchanged. Same-user local controls are not tamper-proof.')
             if input('Type ENABLE to activate: ').strip()!='ENABLE':raise AutoError('SETUP_CANCELLED')
             save_policy(path,p);bridge_record(path,p);ensure(path)
-            print('Jev Auto enabled. Restart Codex after plugin update and review changed hooks once.');return 0
+            print('Workbench enabled. Restart Codex after plugin update and review changed hooks once.');return 0
         if args.command=='route-local':
             p=load_policy(path);p['mlx']=read_private(home_root()/'mlx-installation.json',100_000)
             if not args.recipe:raise AutoError('SELECT_LOCAL_RECIPE')

@@ -1,7 +1,7 @@
 {
   "name": "qualixar-jev",
   "interface": {
-    "displayName": "Qualixar Jev"
+    "displayName": "Qualixar Jev Codex Workbench"
   },
   "plugins": [
     {

@@ -13,7 +13,7 @@ This is an independent open-source integration from **Qualixar**, created by **V
 | Capability | What it does | Boundary |
 |---|---|---|
 | Standing workspace operation | The owner enrolls a reviewed workspace once with an expiry and daily call/byte limits. | Enrollment records a classification label but cannot detect confidential prose; native Codex permissions remain in force. |
-| Compact Jev results | Codex sees a small decision and a receipt ID. | Full supplied evidence stays local and can be fetched with `jev_recall`. |
+| Compact Jev results | Codex sees a small decision and a receipt ID. | The full receipt and a local copy of supplied evidence remain recoverable with `jev_recall`; an explicit remote call transmits its selected state to the configured provider. |
 | Extractive output reduction | Eligible long plain-text tool results can be shortened by keeping relevant source blocks. | Automatic hook filtering requires a local Laya-MLX `sieve` route; errors, constraints, instruction files, uncertain blocks, and structured SLM output are preserved. |
 | Shared broker | Parent and child work in one workspace share the budget, content-addressed cache, and coalesced identical calls. | A cache hit is labelled; it is not a second provider judgment. |
 | Optional Laya-MLX | A pinned local model can handle selected small `sieve` and `probe` routes on Apple Silicon. | Codex keeps its selected coding model; large-context and browser routes remain on Jev unless separately evaluated. |
@@ -93,7 +93,7 @@ python3 auto_entry.py probe --workspace /absolute/path/to/reviewed-workspace
 
 The installer asks the owner to type `INSTALL`; routing asks for `LOCAL`. The worker remains resident after warmup. The probe reports whether it ran actual local inference or returned a recorded cache result. The English checkpoint's input limits are enforced before inference; an oversized or unavailable local route preserves the original text rather than silently sending it to Jev. See [Laya-MLX setup](docs/JEV_AUTO_1_1_3.md).
 
-## Existing browser path — experimental
+## Existing browser path
 
 ![Conceptual existing-browser path: Codex controls its authorized tab, Jev offers bounded guidance, and Codex verifies the result in the same tab.](docs/assets/existing-browser-path.png)
 

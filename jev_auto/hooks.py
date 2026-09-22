@@ -30,14 +30,14 @@ def handle(event,base=None,caller=None,starter=None):
     try:
         if name=='SessionStart':
             call(path,{'op':'prepare_runtime'})
-            return {'hookSpecificOutput':{'hookEventName':name,'additionalContext':'Jev Auto 1.1.3 is enrolled here. Eligible decisions use the standing budget; do not request per-turn grants. Preserve SLM and the existing Computer Use skill.'}}
+            return {'hookSpecificOutput':{'hookEventName':name,'additionalContext':'Qualixar Jev Codex Workbench 1.1.3 is enrolled here. Eligible decisions use the standing budget; do not request per-turn grants. Preserve SLM and the existing Computer Use skill.'}}
         if name=='UserPromptSubmit' and isinstance(session,str):
             goal=event.get('prompt','')
             call(path,{'op':'set_goal','session':session,'goal':goal})
             result=call(path,{'op':'prepare','goal':goal})
             if result.get('packet'):return {'hookSpecificOutput':{'hookEventName':name,'additionalContext':result['packet']}}
         if name=='SubagentStart':
-            return {'hookSpecificOutput':{'hookEventName':name,'additionalContext':'Use this workspace\'s Jev Auto service and shared budget. Pass your narrow goal explicitly to jev_prepare or jev_reduce. Do not create grants, copy full receipts, or alter SLM.'}}
+            return {'hookSpecificOutput':{'hookEventName':name,'additionalContext':'Use this workspace\'s Workbench service and shared budget. Pass your narrow goal explicitly to jev_prepare or jev_reduce. Do not create grants, copy full receipts, or alter SLM.'}}
         if name=='PreToolUse':return None  # no extra model call before every command
         if name=='PostToolUse' and p['native_output_rewrite']:
             # A tool result may contain confidential prose that pattern matching

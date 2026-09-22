@@ -2,7 +2,7 @@
 name: jev-auto-browser
 description: Execute short Jev-selected navigation bursts inside Codex's existing Computer Use browser, with compact handoffs and no separate browser driver.
 ---
-# Jev Auto browser
+# Workbench browser bridge
 
 Prerequisites: workspace is enrolled, broker running, and its browser origins were approved.
 Use the existing Computer Use skill to obtain an authorized tab in cua_repl. Follow that

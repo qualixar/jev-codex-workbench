@@ -19,8 +19,9 @@ to local Laya-MLX. Automatic `PostToolUse` reduction runs only with a local Laya
 operator must review it; the enrollment classification label cannot detect ordinary
 confidential prose. The browser bridge and broker both check the owner's step limit.
 
-The former strict grant workflow below the README separator applies only to unenrolled legacy
-operation. Enrolled Auto calls must not be sent back through terminal per-request approval.
+The original strict grant workflow in `docs/LIVE_VALIDATION.md` applies only to
+unenrolled legacy operation. Enrolled workbench calls do not need terminal
+per-request grants, while native Codex tool permissions remain in force.
 Use your existing private credential. Do not paste keys into Codex or the browser REPL.
 
 For MLX: run `python3 scripts/install_laya_mlx.py`, then `auto_entry.py route-local` for the

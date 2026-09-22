@@ -62,7 +62,7 @@ def main() -> int:
         raise SafeError("PYTHON_3_11_REQUIRED")
     if not sys.stdin.isatty():
         raise SafeError("PRIVATE_TERMINAL_REQUIRED: run this yourself outside agent logs")
-    print("Qualixar Jev Control installer")
+    print("Qualixar Jev Codex Workbench installer")
     print("Your key is entered through a hidden prompt and is never passed to Codex chat.")
     configure()
     ensure_default_policy()

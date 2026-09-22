@@ -1,31 +1,17 @@
-# One-time hook trust for Codex Desktop
+# Review Qualixar Jev Codex Workbench hooks
 
-Policy Mode is installed globally, but Codex deliberately does not run new or changed
-plugin hooks until the local user reviews them. This protects users from a plugin silently
-gaining pre-prompt or pre-tool execution.
+Codex skips new or changed plugin hooks until the local user reviews and trusts them. Plugin installation, MCP tool availability, and hook trust are separate checks.
 
-Codex Desktop currently has no `/hooks` command. Use the Codex CLI once; it shares the same
-local configuration and hook-trust state as Desktop.
+1. Fully quit Codex Desktop after installing or refreshing the plugin.
+2. Open a private terminal in a repository you trust and run `codex`.
+3. Open `/hooks`. Inspect the entries whose source is `qualixar-jev-control@qualixar-jev` and whose command points to that plugin's current `jev_policy_hook.py`.
+4. Review the five events in 1.1.3: `SessionStart`, `UserPromptSubmit`, `SubagentStart`, `PreToolUse`, and `PostToolUse`. Trust only the definitions you intend to run. Do not use a broad trust-all action for unrelated plugins you have not reviewed.
+5. Quit the CLI and reopen Codex Desktop. In a fresh task, verify the 1.1.3 MCP tools and, where relevant, the hook behavior.
 
-1. Fully quit Codex Desktop.
-2. Open a private terminal and run `codex` from any directory you already trust.
-3. When Codex says hooks need review, choose **Review hooks**.
-4. Trust only these three entries from `qualixar-jev-control@qualixar-jev`:
-   `UserPromptSubmit`, `PreToolUse`, and `PostToolUse`.
-5. Exit the CLI with `/exit`, then reopen Codex Desktop and start a new task.
+Enrolled prompt preparation builds a local shortlist. Automatic `PostToolUse` reduction runs only when the owner selected the local Laya-MLX `sieve` route. Explicit remote Jev calls still use native Codex permissions and the workspace policy. An unenrolled workspace retains the original policy/grant path.
 
-After this one-time review, Policy Mode runs locally on every submitted task in `assist`
-mode. A plugin update that changes a hook requires a fresh review because Codex binds trust
-to the hook's content hash.
+A plugin update that changes hook content may require review again. The hook menu displays installed and active counts and each selected hook's source and trust state. See the [official Codex hooks reference](https://learn.chatgpt.com/docs/hooks) for current host semantics.
 
-Do not choose a broad “trust all” option if the screen lists hooks from other plugins that
-you have not reviewed.
+## Managed deployments
 
-## Managed enterprise deployment
-
-Managed hooks are for an organization that controls devices and Codex policy through its
-own `requirements.toml` and MDM deployment. A public plugin cannot mark its own hooks as
-managed or auto-trusted. An administrator may deploy reviewed hook scripts in an approved
-managed directory and configure them under the organization’s managed Codex policy. Keep
-provider credentials, data classification, and workspace grants separate from that device
-policy. See the current OpenAI hooks documentation before deployment.
+An organization may deploy reviewed hooks under its own managed Codex policy. A public plugin cannot make itself managed or auto-trusted. Keep provider credentials, workspace enrollment, and device policy separate. See the official hooks reference for managed-host details.

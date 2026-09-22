@@ -12,7 +12,7 @@ def definitions(legacy):
     tools=legacy.tools(scope='global-hybrid')
     for t in tools:
         if t['name']=='jev_evaluate':
-            t['description']='Evaluate one approved case using enrolled workspace authority. No per-request grant is needed in Jev Auto. Return a compact recommendation and local receipt ID, never execution authority.'
+            t['description']='Evaluate one approved case using enrolled workspace authority. No per-request grant is needed in the Workbench. Return a compact recommendation and local receipt ID, never execution authority.'
             t['inputSchema'].pop('allOf',None);t['inputSchema']['required']=['case_id','workspace_path','state']
     def tool(name,description,props,required):
         return {'name':name,'description':description,'inputSchema':{'type':'object','properties':props,'required':required,'additionalProperties':False}}
@@ -71,7 +71,7 @@ def serve():
                 v=params.get('protocolVersion');initialized=True
                 result={'protocolVersion':v if v in VERSIONS else VERSIONS[0],
                         'serverInfo':{'name':'qualixar-jev','version':'1.1.3'},'capabilities':{'tools':{'listChanged':False}},
-                        'instructions':'Enrolled workspaces use standing Jev Auto authority. Use compact recommendations; detailed receipts are local. Preserve SLM and the existing browser. Never create grants yourself.'}
+                        'instructions':'Enrolled workspaces use standing Workbench authority. Use compact recommendations; detailed receipts are local. Preserve SLM and the existing browser. Never create grants yourself.'}
             elif method=='ping':result={}
             elif not initialized:raise AutoError('MCP_INITIALIZE_FIRST')
             elif method=='tools/list':result={'tools':definitions(legacy)}

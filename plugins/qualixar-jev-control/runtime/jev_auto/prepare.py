@@ -50,5 +50,5 @@ def prepare(engine,p,goal):
                  'criteria':['Not useful','Possibly useful','Directly useful']} for i in range(len(items))}
     result=engine.judge('prepare',{'goal':goal,'candidates':items},qs,p)
     selected=[items[i]['id'] for i in range(len(items)) if result['answers'][f'c{i}']['score']>=1.5 and result['answers'][f'c{i}']['confidence']>=.5]
-    packet=('Jev Auto shortlist (advisory; keep all mandatory instructions):\n'+'\n'.join(selected))[:2400] if selected else ''
+    packet=('Workbench shortlist (advisory; keep all mandatory instructions):\n'+'\n'.join(selected))[:2400] if selected else ''
     return {'packet':packet,'selected':selected,'receipt_id':result.get('receipt_id'),'reason':'candidate_selection'}

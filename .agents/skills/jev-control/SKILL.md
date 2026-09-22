@@ -4,7 +4,7 @@ description: Set up and operate this project's Jev bounded-judgment workbench th
 ---
 
 
-## Jev Auto 1.1.3 override
+## Workbench 1.1.3 enrolled operation
 
 For an enrolled workspace, use standing Auto authority, not request-bound terminal grants. Use compact results and preserve SLM. The legacy instructions below apply only outside enrollment.
 Read the project's AGENTS.md before acting. For installation use START_HERE.md and

@@ -23,11 +23,32 @@ provider selection are rejected. Redirects and environment proxy settings are no
 automatically followed. A corporate network
 requiring an approved proxy may therefore fail closed; do not bypass that network's
 controls. Request byte/question/candidate limits bound payload size. Bytes are not
-an exact token estimate. Retries consume the same shared HTTP-attempt grant. Ambiguous
+an exact token estimate. In enrolled 1.1.3 workspaces, attempts consume the shared
+workspace budget; unenrolled legacy requests consume their grant. Ambiguous
 timeouts are not automatically retried, because the service may already have processed
 the call. HTTP error bodies are not echoed into logs or the MCP context.
 
-## Local grant
+## Standing workspace enrollment in 1.1.3
+
+The owner privately enrolls a reviewed workspace with provider, expiry, daily attempt
+and payload-byte limits, and optional browser origins. The broker rechecks this policy
+before reserving a call. A changed file can produce a new decision without revoking
+the enrollment. Revocation disables further Auto requests. These local controls are
+not account billing caps or isolation from malicious same-user code.
+
+The data-classification label records owner intent; it is not a confidential-text
+classifier. The `UserPromptSubmit` hook keeps its prompt shortlist local, and automatic
+`PostToolUse` reduction runs only on the local Laya-MLX `sieve` route. Explicit remote
+Jev calls still transmit the state supplied to that call. Review source and browser
+text before sending it, even if pattern screening finds no secret.
+
+The browser bridge works through an existing authorized Codex tab. It verifies the
+enrolled origin and caps actions to the owner's configured step limit; the broker
+also rejects steps beyond that limit. An approved origin does not mean every page on
+that origin is safe to transmit. The bridge does not create a second browser or
+obtain independent execution authority.
+
+## Legacy local grant for unenrolled workspaces
 
 The private interactive helper grants a fixed number of HTTP attempts for a limited
 time. CLI and MCP share the SQLite counter. It is not a monetary cap, provider billing
