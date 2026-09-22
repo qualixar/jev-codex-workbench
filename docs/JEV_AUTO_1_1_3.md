@@ -1,4 +1,4 @@
-# Jev Auto 1.1.3
+# Qualixar Jev Codex Workbench 1.1.3
 
 The installed facade adds standing workspace operation, compact results and local recovery
 while retaining the original `jevkit` compatibility path. Optional MLX is isolated; the browser
@@ -12,6 +12,12 @@ Native hook review is still required after the plugin is refreshed from this act
 The service shares budgets/cache by workspace, not by code revision. Changed evidence triggers
 fresh evaluation. Full receipts stay local; compact MCP responses contain a receipt ID for
 `jev_recall`. A failure to optimize preserves ordinary Codex behavior and original evidence.
+
+Automatic prompt preparation uses a local shortlist unless `prepare` is explicitly routed
+to local Laya-MLX. Automatic `PostToolUse` reduction runs only with a local Laya-MLX
+`sieve` route. Explicit remote Jev calls still transmit their supplied state, so the
+operator must review it; the enrollment classification label cannot detect ordinary
+confidential prose. The browser bridge and broker both check the owner's step limit.
 
 The former strict grant workflow below the README separator applies only to unenrolled legacy
 operation. Enrolled Auto calls must not be sent back through terminal per-request approval.
@@ -29,6 +35,7 @@ python3 jev.py suite
 python3 scripts/verify_package.py
 ```
 
-Offline tests do not establish actual native browser compatibility, MLX speed or cost savings.
+Offline tests alone do not establish native browser compatibility, MLX speed or cost savings.
+See [architecture](ARCHITECTURE_1_1_3.md) for the native flow and trust boundaries.
 The delivered package's native acceptance matrix and measurement contract remain release gates.
 Local character-withholding counters are proposals, not native token/invoice measurements.

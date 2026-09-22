@@ -73,6 +73,9 @@ class Engine:
     def browser(self,req):
         p=self.policy();origin=req.get('origin');allowed=p['browser_origins']
         if origin not in allowed:raise AutoError('BROWSER_ORIGIN_NOT_ENROLLED')
+        step=req.get('step_index')
+        if not isinstance(step,int) or isinstance(step,bool) or not 0<=step<p['browser_max_steps']:
+            raise AutoError('BROWSER_STEP_BUDGET')
         actions=req.get('actions')
         if not isinstance(actions,list) or not 1<=len(actions)<=30:raise AutoError('BROWSER_CANDIDATE_COUNT')
         ids=[a.get('id') for a in actions if isinstance(a,dict)]

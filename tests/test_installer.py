@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import os
 import tempfile
 import unittest
@@ -96,6 +97,22 @@ class InstallerTests(unittest.TestCase):
                 ],
             ],
         )
+
+    def test_installer_refuses_stale_marketplace_source(self):
+        installer = load_script("install.py")
+        commands = []
+
+        def runner(command, **_kwargs):
+            commands.append(command)
+            class Result:
+                returncode = 0
+                stdout = json.dumps({"installedRoot": "/tmp/old-jev-checkout"})
+                stderr = ""
+            return Result()
+
+        with self.assertRaisesRegex(Exception, "MARKETPLACE_SOURCE_MISMATCH"):
+            installer.install_plugin(ROOT, runner=runner)
+        self.assertEqual(len(commands), 1)
 
 
 if __name__ == "__main__":

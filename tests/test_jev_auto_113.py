@@ -12,6 +12,7 @@ from jev_auto.protocol import validate_questions,validate_response,compact_recei
 from jev_auto.store import Store,SingleFlight
 from jev_auto.engine import Engine
 from jev_auto.sieve import bounded_blocks,reduce_text,render
+from jev_auto.prepare import prepare
 from jev_auto.hooks import handle,plain_output
 from jev_auto.mlx_preflight import preflight
 from jev_auto.measure import compare,extract_codex_usage
@@ -208,11 +209,16 @@ class EngineTests(WorkspaceTest):
         with self.assertRaises(AutoError):self.engine.browser({'origin':'https://other.example','actions':[]})
         self.assertEqual(self.provider.calls,0)
     def test_browser_choice_advisory(self):
-        req={'origin':'https://example.org','goal':'View next page','state':'Next page link','actions':[{'id':'a0','op':'click','description':'Next'}]}
+        req={'origin':'https://example.org','goal':'View next page','state':'Next page link','step_index':0,'actions':[{'id':'a0','op':'click','description':'Next'}]}
         self.assertFalse(self.engine.browser(req)['execution_authorized'])
     def test_browser_unknown_operation_rejected(self):
-        req={'origin':'https://example.org','actions':[{'id':'a0','op':'shell','description':'not allowed'}]}
+        req={'origin':'https://example.org','step_index':0,'actions':[{'id':'a0','op':'shell','description':'not allowed'}]}
         with self.assertRaises(AutoError):self.engine.browser(req)
+    def test_browser_owner_step_cap_enforced(self):
+        self.change(browser_max_steps=2)
+        req={'origin':'https://example.org','step_index':2,'actions':[{'id':'a0','op':'click','description':'Next'}]}
+        with self.assertRaisesRegex(AutoError,'BROWSER_STEP_BUDGET'):self.engine.browser(req)
+        self.assertEqual(self.provider.calls,0)
 
 class SieveTests(WorkspaceTest):
     def text(self):return '\n'.join('Routine information item %03d '%n+'x'*60 for n in range(160))
@@ -253,8 +259,12 @@ class HookTests(WorkspaceTest):
         def boom(*a):raise AssertionError('must not call')
         self.assertIsNone(handle(self.event('PreToolUse'),self.base,caller=boom,starter=boom))
     def test_posttool_contract(self):
+        self.change(routes={'sieve':'laya-mlx'})
         out=self.runhook(self.event('PostToolUse',tool_name='Bash',tool_response='long output'),lambda *a:{'changed':True,'text':'compact'})
         self.assertEqual(out,{'continue':False,'stopReason':'compact'})
+    def test_remote_route_never_auto_sends_tool_output(self):
+        def fail(*_):raise AssertionError('remote sieve must not run from a hook')
+        self.assertIsNone(self.runhook(self.event('PostToolUse',tool_name='Bash',tool_response='ordinary confidential prose'),fail))
     def test_nonzero_exit_preserved(self):self.assertIsNone(plain_output({'tool_response':{'exit_code':1,'stdout':'failure'}}))
     def test_mcp_slm_object_not_rewritten(self):
         def boom(*a):raise AssertionError('must not call')
@@ -274,6 +284,14 @@ class HookTests(WorkspaceTest):
         self.assertIn('shared budget',result['hookSpecificOutput']['additionalContext'])
     def test_unenrolled_no_hook_effect(self):
         other=self.root/'outside';other.mkdir();self.assertIsNone(handle({'hook_event_name':'SessionStart','cwd':str(other)},self.base))
+
+class PreparationTests(WorkspaceTest):
+    @patch('jev_auto.prepare.candidates',return_value=[{'id':'file:public.py','kind':'file','description':'public.py'}])
+    def test_remote_enrollment_keeps_automatic_prompt_local(self,_candidates):
+        result=prepare(self.engine,self.p,'Implement the confidential roadmap feature in public.py with tests and review')
+        self.assertEqual(result['reason'],'local_candidate_selection')
+        self.assertEqual(result['selected'],['file:public.py'])
+        self.assertEqual(self.provider.calls,0)
 
 class FakeTokenizer:
     mask_token='[MASK]'

@@ -1,13 +1,27 @@
 /** Offline existing-tab contract tests. No browser is launched and no provider is called. */
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {availableActions,originOf,parseState,createSession,run,ipc} from '../plugins/qualixar-jev-control/skills/jev-auto-browser/bridge.mjs';
+import {mkdtemp,mkdir,writeFile,chmod,rm} from 'node:fs/promises';
+import {tmpdir} from 'node:os';
+import {join,resolve} from 'node:path';
+import {availableActions,originOf,parseState,createSession,run,ipc,loadConfig} from '../plugins/qualixar-jev-control/skills/jev-auto-browser/bridge.mjs';
 const snapshot=(label='Next',origin='https://example.org',extra='')=>`Browser tab: Demo URL: "${origin}/page".\n1 button ${label}\n2 text field Query\n${extra}`;
 function tab(states=[snapshot()]) {
  let n=0;const calls=[];
  return {calls,async getAXState(){return states[Math.min(n++,states.length-1)];},async click(i){calls.push(['click',i]);},async pressKey(k){calls.push(['press',k]);},async reload(){calls.push(['reload']);}};
 }
 const config=(extra={})=>({goal:'Read the next result page',allowedOrigins:['https://example.org'],maxSteps:3,maxMs:1000,waitMs:1,decide:async()=>({choice:'a0',confidence:.99,receipt_id:'a'.repeat(64)}),...extra});
+test('private bridge config loads from an explicit config root',async t=>{
+ const root=await mkdtemp(join(tmpdir(),'jev-browser-config-'));
+ t.after(()=>rm(root,{recursive:true,force:true}));
+ const folder=join(root,'qualixar-jev-control');await mkdir(folder,{mode:0o700});
+ const file=join(folder,'auto-bridge.json');
+ const record={socketPath:'/tmp/synthetic.sock',allowedOrigins:['https://example.org'],maxSteps:3};
+ await writeFile(file,JSON.stringify({workspaces:{[resolve('/synthetic-workspace')]:record}}),{mode:0o600});
+ assert.deepEqual(await loadConfig('/synthetic-workspace',root),record);
+ await chmod(file,0o644);
+ await assert.rejects(()=>loadConfig('/synthetic-workspace',root),/UNSAFE_BRIDGE_CONFIGURATION/);
+});
 test('parses observed controls',()=>{assert.equal(parseState(snapshot()).length,2);});
 test('origin includes only scheme and authority',()=>assert.equal(originOf(snapshot()),'https://example.org'));
 test('unknown origin is rejected',()=>assert.throws(()=>originOf('not a state')));
@@ -33,6 +47,11 @@ test('provider error hands off, not endless retry',async()=>{let calls=0;const r
 test('WAIT bounded at three observations',async()=>{const t=tab();const result=await run(t,config({decide:async()=>({choice:'WAIT',confidence:.99}),maxSteps:10}));assert.equal(result.reason,'loading_timeout');assert.equal(t.calls.length,0);});
 test('step budget is enforced',async()=>{const t=tab([snapshot(),snapshot(),snapshot('Previous'),snapshot('Previous'),snapshot('Next')]);assert.equal((await run(t,config({maxSteps:1}))).reason,'step_limit');});
 test('zero or excessive step limits rejected',async()=>{for(const maxSteps of [0,31])await assert.rejects(()=>run(tab(),config({maxSteps})));});
+test('run overrides cannot expand enrolled browser authority',async()=>{
+ const s=createSession(tab(),config({maxSteps:2}));
+ await assert.rejects(()=>s.run({maxSteps:3}),/BROWSER_STEP_BUDGET/);
+ await assert.rejects(()=>s.run({allowedOrigins:['https://other.example']}),/BROWSER_AUTHORITY_OVERRIDE/);
+});
 test('invalid confidence configuration rejected',async()=>{await assert.rejects(()=>run(tab(),config({minConfidence:NaN})));});
 test('action failure returns control',async()=>{const t=tab();t.click=async()=>{throw Error('stale');};assert.equal((await run(t,config())).reason,'action_or_origin_error');});
 test('nothing observed does not invent a selector',async()=>{const t=tab([snapshot('Unrelated')]);assert.equal((await run(t,config())).reason,'no_observed_candidate');assert.equal(t.calls.length,0);});

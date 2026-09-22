@@ -5,7 +5,7 @@
  * Uses only an existing authorized Computer Use tab. Never launches a browser.
  */
 import {readFile, lstat} from 'node:fs/promises';
-import {homedir} from 'node:os';
+import {homedir, userInfo} from 'node:os';
 import {join, resolve} from 'node:path';
 import net from 'node:net';
 
@@ -39,11 +39,11 @@ export function availableActions(state,controls=[],discover=true) {
   const seen=new Set();
   return actions.filter(a=>{const k=JSON.stringify(a);if(seen.has(k))return false;seen.add(k);return true;}).slice(0,30).map((a,i)=>({...a,id:'a'+i}));
 }
-export async function loadConfig(workspacePath) {
-  const root=process.env.XDG_CONFIG_HOME||join(homedir(),'.config');
+export async function loadConfig(workspacePath, configHome) {
+  const root=configHome ? resolve(configHome) : join(homedir(),'.config');
   const path=join(root,'qualixar-jev-control','auto-bridge.json');
   const st=await lstat(path);
-  if(!st.isFile()||st.isSymbolicLink()||(st.mode&0o077)||(process.getuid&&st.uid!==process.getuid()))throw new Error('UNSAFE_BRIDGE_CONFIGURATION');
+  if(!st.isFile()||st.isSymbolicLink()||(st.mode&0o077)||st.uid!==userInfo().uid)throw new Error('UNSAFE_BRIDGE_CONFIGURATION');
   const cfg=JSON.parse(await readFile(path,'utf8'));
   const record=cfg.workspaces?.[resolve(workspacePath)];
   if(!record)throw new Error('WORKSPACE_NOT_ENROLLED');
@@ -51,7 +51,7 @@ export async function loadConfig(workspacePath) {
 }
 export async function ipc(socketPath,payload,timeoutMs=15000) {
   const st=await lstat(socketPath);
-  if(!st.isSocket()||st.isSymbolicLink()||(st.mode&0o077)||(process.getuid&&st.uid!==process.getuid()))throw new Error('BROKER_SOCKET_UNAVAILABLE');
+  if(!st.isSocket()||st.isSymbolicLink()||(st.mode&0o077)||st.uid!==userInfo().uid)throw new Error('BROKER_SOCKET_UNAVAILABLE');
   return new Promise((ok,no)=>{
     const socket=net.createConnection({path:socketPath});socket.setEncoding('utf8');let data='',settled=false;
     const finish=(err,result)=>{if(settled)return;settled=true;clearTimeout(timer);socket.destroy();err?no(err):ok(result);};
@@ -78,6 +78,9 @@ async function execute(tab,a) {
 export function createSession(tab,config) {
   const history=[];let lastReceipt=null;
   async function run(overrides={}) {
+    const enrolledSteps=config.maxSteps??10;
+    if(overrides.maxSteps!==undefined&&overrides.maxSteps>enrolledSteps)throw new Error('BROWSER_STEP_BUDGET');
+    if(overrides.allowedOrigins!==undefined||overrides.socketPath!==undefined)throw new Error('BROWSER_AUTHORITY_OVERRIDE');
     const c={controls:[],discover:true,maxSteps:10,maxMs:45000,minConfidence:.55,...config,...overrides};
     if(typeof c.goal!=='string'||!c.goal||!Array.isArray(c.allowedOrigins)||!c.allowedOrigins.length||!Number.isInteger(c.maxSteps)||c.maxSteps<1||c.maxSteps>30||!Number.isFinite(c.maxMs)||c.maxMs<1||c.maxMs>45000||!Number.isFinite(c.minConfidence)||c.minConfidence<.55||c.minConfidence>1||!Array.isArray(c.controls)||(c.waitMs!==undefined&&(!Number.isFinite(c.waitMs)||c.waitMs<1||c.waitMs>5000)))throw new Error('INVALID_BROWSER_CONTRACT');
     const started=performance.now(),offset=history.length;
@@ -98,7 +101,7 @@ export function createSession(tab,config) {
       if(!actions.length)return finish('handoff','no_observed_candidate');
       let decision;
       try {
-        const payload={op:'browser',origin:originOf(state),goal:c.goal,state,actions,history:history.slice(-5)};
+        const payload={op:'browser',origin:originOf(state),goal:c.goal,state,actions,history:history.slice(-5),step_index:i};
         decision=c.decide?await c.decide(payload):await ipc(c.socketPath,payload,Math.max(1,Math.min(15000,c.maxMs-(performance.now()-started))));
       } catch{return finish('handoff','decision_unavailable');}
       if(!decision||!Number.isFinite(decision.confidence)||decision.confidence<0||decision.confidence>1||!['DONE','WAIT','HANDOFF',...actions.map(a=>a.id)].includes(decision.choice))return finish('handoff','invalid_decision');

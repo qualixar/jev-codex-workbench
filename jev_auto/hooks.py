@@ -40,6 +40,9 @@ def handle(event,base=None,caller=None,starter=None):
             return {'hookSpecificOutput':{'hookEventName':name,'additionalContext':'Use this workspace\'s Jev Auto service and shared budget. Pass your narrow goal explicitly to jev_prepare or jev_reduce. Do not create grants, copy full receipts, or alter SLM.'}}
         if name=='PreToolUse':return None  # no extra model call before every command
         if name=='PostToolUse' and p['native_output_rewrite']:
+            # A tool result may contain confidential prose that pattern matching
+            # cannot recognize. Automatic reduction is local-only.
+            if p.get('routes',{}).get('sieve',p['provider'])!='laya-mlx':return None
             tool=event.get('tool_name','')
             # Never rewrite machine-consumed MCP objects or the Computer Use script result.
             if tool not in ('Bash','Read','Grep') or PROTECTED.search(str(event.get('tool_input',{}))):return None

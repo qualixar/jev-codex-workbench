@@ -29,6 +29,8 @@ console.log(outcome);
 
 Replace the two paths with observed local paths, not guessed values. existingAuthorizedTab
 means the live tab object obtained by the user's Computer Use skill, not a new instance.
+If enrollment used a custom `XDG_CONFIG_HOME`, pass that directory as the second
+argument to `loadConfig`; the browser runtime does not expose environment variables.
 The defaults discover navigation labels only. For other benign observed controls, supply
 explicit `{op:'click', name:'EXACT_OBSERVED_LABEL'}` entries. Never invent selectors, use
 hidden DOM fields, send cookies/credentials, or ask Jev to interpret screenshots.

@@ -2,6 +2,7 @@
 """Install the local Codex marketplace/plugin and configure one live provider."""
 from __future__ import annotations
 
+import json
 import shutil
 import subprocess
 import sys
@@ -37,16 +38,23 @@ def install_plugin(
             "--json",
         ],
     ]
+    expected_version = json.loads(
+        (root / "plugins" / "qualixar-jev-control" / ".codex-plugin" / "plugin.json").read_text()
+    )["version"]
     for command in commands:
         result = runner(command, text=True, capture_output=True)
         if result.returncode != 0:
-            message = (result.stderr or "").strip()
-            if "already" in message.lower() and "marketplace" in command:
-                continue
-            raise SafeError(
-                "PLUGIN_INSTALL_FAILED: "
-                + (message.splitlines()[-1] if message else "Codex returned an error")
-            )
+            raise SafeError("PLUGIN_INSTALL_FAILED: use the documented upgrade steps")
+        try:
+            details = json.loads(result.stdout or "{}")
+        except json.JSONDecodeError:
+            raise SafeError("PLUGIN_INSTALL_RESULT_INVALID") from None
+        if "marketplace" in command:
+            installed_root = details.get("installedRoot")
+            if installed_root and Path(installed_root).resolve() != root.resolve():
+                raise SafeError("MARKETPLACE_SOURCE_MISMATCH: use the documented upgrade steps")
+        elif details.get("version") and details["version"] != expected_version:
+            raise SafeError("PLUGIN_VERSION_MISMATCH: use the documented upgrade steps")
 
 
 def main() -> int:
@@ -59,11 +67,11 @@ def main() -> int:
     configure()
     ensure_default_policy()
     install_plugin(ROOT)
-    print("Installation complete. Fully quit and reopen Codex Desktop, then start a new task.")
-    print("One-time setup: open a private terminal, run `codex`, then review and trust only")
-    print("the three Qualixar Jev hooks. `/hooks` is currently a Codex CLI command, not Desktop UI.")
-    print("After trust, quit the CLI and restart Codex Desktop. Policy Mode is then on in assist mode.")
-    print("Live calls still require a separate workspace-bound human grant.")
+    print("Installation complete. Review the changed Qualixar Jev hooks in the Codex CLI,")
+    print("then fully quit and reopen Codex Desktop before relying on hook behavior.")
+    print("Run `python3 auto_entry.py enroll --help` in a private terminal to review")
+    print("one-time workspace enrollment. Enrolled workspaces use standing daily limits;")
+    print("unenrolled workspaces retain the original grant-based path.")
     return 0
 
 
