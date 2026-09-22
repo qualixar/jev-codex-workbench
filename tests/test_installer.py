@@ -83,7 +83,8 @@ class InstallerTests(unittest.TestCase):
 
             return Result()
 
-        installer.install_plugin(ROOT, runner=runner)
+        with patch.object(installer.shutil, "which", return_value="/usr/bin/codex"):
+            installer.install_plugin(ROOT, runner=runner)
         self.assertEqual(
             commands,
             [
@@ -110,8 +111,9 @@ class InstallerTests(unittest.TestCase):
                 stderr = ""
             return Result()
 
-        with self.assertRaisesRegex(Exception, "MARKETPLACE_SOURCE_MISMATCH"):
-            installer.install_plugin(ROOT, runner=runner)
+        with patch.object(installer.shutil, "which", return_value="/usr/bin/codex"):
+            with self.assertRaisesRegex(Exception, "MARKETPLACE_SOURCE_MISMATCH"):
+                installer.install_plugin(ROOT, runner=runner)
         self.assertEqual(len(commands), 1)
 
 

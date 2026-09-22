@@ -54,6 +54,8 @@ Use `internal-minimized` only for excerpts you are allowed to send to the select
 
 For an unenrolled workspace, the original grant-based `jevkit` path remains available. See [legacy live validation](docs/LIVE_VALIDATION.md).
 
+**Across folders:** The plugin is installed once for Codex and its tools are available globally. Enrollment follows the Git workspace root, so subfolders of one repository share the standing policy, budget, and cache. A different repository needs its own one-time enrollment before automatic Jev/Laya operation; the local MLX model itself is installed only once on the machine. You do not repeat enrollment for each task or code edit. Native Codex tool and browser permissions still apply.
+
 ### Check the installation
 
 ```bash

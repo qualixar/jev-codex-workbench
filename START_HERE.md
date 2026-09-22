@@ -29,6 +29,9 @@ python3 auto_entry.py enroll \
 The CLI displays the scope and asks the owner to type `ENABLE`. The classification label records your selection; it does not detect confidential prose. Automatic prompt preparation stays local. Automatic output filtering requires a local Laya-MLX `sieve` route. Explicit remote Jev calls transmit the supplied state to the selected provider, so review that input. Native Codex permissions still apply.
 
 For an unenrolled workspace, the original grant-based path remains available in [legacy live validation](docs/LIVE_VALIDATION.md).
+The plugin is globally available in Codex; standing policy follows the Git workspace
+root. Subfolders share one enrollment, while another repository needs its own one-time
+enrollment and local route selection.
 
 ## Check the result
 

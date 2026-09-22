@@ -78,8 +78,14 @@ class Providers:
         if self._warm_error:raise AutoError(self._warm_error)
         return {'ready':ready.is_set(),'provider':'laya-mlx'}
     def ready_for_request(self,p):
-        if p['provider']=='laya-mlx' and not self.warmup(p)['ready']:
-            raise AutoError('MLX_WARMING_UP_USE_NORMAL_CODEX')
+        if p['provider']=='laya-mlx':
+            self.warmup(p)
+            # After an idle broker restart, the first local call should wait a
+            # bounded time for the resident worker rather than require a manual
+            # warmup command. Leave room inside the default 16s IPC timeout.
+            if not self._ready.wait(min(p['timeout_seconds'],10)):
+                raise AutoError('MLX_WARMING_UP_USE_NORMAL_CODEX')
+            if self._warm_error:raise AutoError(self._warm_error)
     def local(self,p,state,qs):
         self.warmup(p)
         if not self._ready.is_set():raise AutoError('MLX_WARMING_UP_USE_NORMAL_CODEX')

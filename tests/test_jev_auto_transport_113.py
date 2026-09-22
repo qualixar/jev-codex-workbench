@@ -99,6 +99,12 @@ class FakeMLX:
     def predict(self,state,qs,timeout):return {'model':'fake-local','answers':{'q':{'type':'noul','noul':.8}},'usage':{'input_tokens':12,'output_tokens':0}}
 
 class MLXProcessTests(unittest.TestCase):
+    def test_first_local_request_waits_for_resident_warmup(self):
+        p=Providers();cfg={'provider':'laya-mlx','timeout_seconds':2,'mlx':{'repository':'fake-local','revision':'pinned','weight_sha256':'x'}}
+        with patch('jev_auto.mlx_process.MLXProcess',FakeMLX):
+            p.ready_for_request(cfg)
+            self.assertEqual(p._mlx.loads,1)
+        p.close()
     def test_runtime_resident_not_loaded_each_prediction(self):
         p=Providers();cfg={'provider':'laya-mlx','timeout_seconds':2,'mlx':{'repository':'fake-local','revision':'pinned','weight_sha256':'x'}}
         with patch('jev_auto.mlx_process.MLXProcess',FakeMLX):

@@ -77,7 +77,7 @@
     "jev_auto/mlx_worker.py": "1ab65d3830a1db89ad197d2b5aa447d80925e6032e8936f0e525125390d52285",
     "jev_auto/prepare.py": "b441d715034fb5c5d6018400a559cc07f9b9ee391ccdec6fedb20e59fd14a1b9",
     "jev_auto/protocol.py": "ec0630cc398f4289fafd38e19d66c90c4601d87b788703b15da5cf6f64ba4d88",
-    "jev_auto/providers.py": "9e9b70077972d78f00d1f45ebc8c38bd808299cf8e63e8245ff8f19a7ad855f6",
+    "jev_auto/providers.py": "1fc07307faee1d94e8446f4f022641e8d6715e084645bda008d67cc008c12224",
     "jev_auto/server.py": "57c99a7477b7dd7fd1699f0b075b5d3745f696360a0f4779541489593e0d3ce7",
     "jev_auto/settings.py": "d48a60c37c9f04682c01f7db9b2d5d1566fa980ab4ad38a7daf4ae524ac87f2f",
     "jev_auto/sieve.py": "9f8ee76fa19d485065605a1c4dd6cdcc0de3d9040de63993d32af2af246c6fbe",
