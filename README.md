@@ -1,6 +1,6 @@
 # Qualixar Jev Codex Workbench
 
-[![M8ven Score](https://m8ven.ai/badge/mcp/qualixar-jev-codex-workbench-jh3pwy)](https://m8ven.ai/mcp/qualixar-jev-codex-workbench-jh3pwy)
+[![M8ven Score](https://m8ven.ai/badge/mcp/qualixar/jev-codex-workbench)](https://m8ven.ai/mcp/qualixar/jev-codex-workbench)
 
 **An open-source Codex plugin and MCP server for bounded AI coding agent decisions and recoverable context.** The workbench adds TypeSafe Jev around the coding model you already use in Codex. Jev handles narrow semantic judgments; Codex remains responsible for code, tools, and execution. Version **1.1.3** adds standing workspace enrollment, compact receipts, extractive tool-output reduction, shared budgets, and an optional local Laya-MLX route.
 
