@@ -6,6 +6,8 @@
 
 The workbench targets two sources of wasted work: exploring too many candidate files or tools before a narrow decision, and carrying large successful tool outputs through Codex context when only a few source lines matter. It can reuse a decision for an identical request and retrieve omitted evidence exactly when needed. The mechanism is visible below; actual token and time savings still require matched accepted-task measurements.
 
+**Start here:** [Install the Codex plugin in three commands](#install-the-codex-plugin) · [Check the 1.1.3 validation scope](docs/RELEASE_VALIDATION_1_1_3.md).
+
 ![Qualixar Jev Codex Workbench architecture: Codex and its GPT coding model connect to the workbench plugin, which routes bounded decisions to TypeSafe Jev or optional Laya-MLX while SLM and the existing browser remain separate integrations.](docs/assets/qualixar-jev-codex-workbench-architecture.png)
 
 *Architecture overview. The provider branches are decision routes; neither provider receives execution authority. The browser path is included in 1.1.3 but still needs native host acceptance before broad use.*
