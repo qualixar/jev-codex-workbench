@@ -16,8 +16,8 @@ jobs:
         python-version: ["3.11", "3.13"]
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
       - name: Verify release manifest
@@ -26,9 +26,10 @@ jobs:
         run: python3 scripts/package_plugin_runtime.py
       - name: Run tests
         run: python3 -m unittest discover -s tests -v
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: "20"
+          package-manager-cache: false
       - name: Run browser bridge contract tests
         run: node --test tests/jev_auto_browser.test.mjs
       - name: Run all fixture contracts
