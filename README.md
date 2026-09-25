@@ -1,6 +1,8 @@
 # Qualixar Jev Codex Workbench
 
-**Bounded decisions and recoverable context for Codex.** The workbench adds a Qualixar plugin around the coding model you already use in Codex. Jev handles narrow semantic judgments; Codex remains responsible for code, tools, and execution. Version **1.1.3** adds standing workspace enrollment, compact receipts, extractive output reduction, shared budgets, and an optional local Laya-MLX route.
+[![M8ven Score](https://m8ven.ai/badge/mcp/qualixar-jev-codex-workbench-jh3pwy)](https://m8ven.ai/mcp/qualixar-jev-codex-workbench-jh3pwy)
+
+**An open-source Codex plugin and MCP server for bounded AI coding agent decisions and recoverable context.** The workbench adds TypeSafe Jev around the coding model you already use in Codex. Jev handles narrow semantic judgments; Codex remains responsible for code, tools, and execution. Version **1.1.3** adds standing workspace enrollment, compact receipts, extractive tool-output reduction, shared budgets, and an optional local Laya-MLX route.
 
 The workbench targets two sources of wasted work: exploring too many candidate files or tools before a narrow decision, and carrying large successful tool outputs through Codex context when only a few source lines matter. It can reuse a decision for an identical request and retrieve omitted evidence exactly when needed. The mechanism is visible below; actual token and time savings still require matched accepted-task measurements.
 
@@ -24,7 +26,7 @@ This is an independent open-source integration from **Qualixar**, created by **V
 
 The workbench retains the seven original MCP tools and adds `jev_auto_status`, `jev_prepare`, `jev_reduce`, and `jev_recall`. The 20 supplied workflows and their fixtures remain available. Fixtures are simulated contract checks, not live Jev accuracy results.
 
-## Install
+## Install the Codex plugin
 
 Use Python **3.11+** and a Codex installation with the `codex` CLI. The installer needs a private terminal because it asks for your selected provider credential without echoing it.
 
